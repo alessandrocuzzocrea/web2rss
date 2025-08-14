@@ -4,18 +4,21 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/alessandrocuzzocrea/www2rss/internal/www2rss"
+	www2rss "github.com/alessandrocuzzocrea/www2rss/internal/app"
 )
 
 func main() {
-	log.Printf("Starting www2rss v%s...")
+	log.Printf("Starting www2rss...")
 
 	app, err := www2rss.New()
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer app.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer app.Close()
 
-    app.Routes()
-    log.Fatal(http.ListenAndServe(":8080", nil))
+	// Set up routes
+	app.Routes()
+
+	log.Println("Server starting on :8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

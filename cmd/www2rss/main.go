@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/alessandrocuzzocrea/www2rss/internal/app"
+	www2rss "github.com/alessandrocuzzocrea/www2rss/internal/app"
 )
 
 func main() {
