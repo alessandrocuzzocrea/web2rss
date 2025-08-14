@@ -1,0 +1,43 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# CI/CD
+.github
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+www2rss
+*.exe
+
+# Test artifacts
+coverage.out
+coverage.html
+*.test
+
+# Data files (except for schema/migrations)
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
