@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/alessandrocuzzocrea/www2rss/tutorial"
 	_ "github.com/mattn/go-sqlite3"
@@ -58,22 +59,31 @@ func (a *App) Run() error {
 	log.Println("Database connection established")
 	
 	// Create queries instance
-	queries := tutorial.New(db)
 	
-	// Create author parameters
-	tutorialParams := tutorial.CreateAuthorParams{
-		Name: "Test",
-		Bio:  sql.NullString{String: "A sample author bio", Valid: true},
-		Loller: sql.NullString{String: "A sample loller", Valid: true},
+	// Create author parameters (just for demo)
+	// tutorialParams := tutorial.CreateAuthorParams{
+	// 	Name: "Test",
+	// 	Bio:  sql.NullString{String: "A sample author bio", Valid: true},
+	// 	Loller: sql.NullString{String: "A sample loller", Valid: true},
+	// }
+	
+	// Create author in database (just for demo)
+	// author, err := queries.CreateAuthor(ctx, tutorialParams)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to create author: %w", err)
+	// }
+	
+	// log.Printf("Created author: %+v", author)
+	
+
+	mux := a.Routes()
+	port := ":8080" // Default port
+
+	if err := http.ListenAndServe(port, mux); err != nil {
+		return fmt.Errorf("HTTP server failed: %w", err)
 	}
-	
-	// Create author in database
-	author, err := queries.CreateAuthor(ctx, tutorialParams)
-	if err != nil {
-		return fmt.Errorf("failed to create author: %w", err)
-	}
-	
-	log.Printf("Created author: %+v", author)
-	
+
+	log.Println("Server starting on :8080")
+
 	return nil
 }
