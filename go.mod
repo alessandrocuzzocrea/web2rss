@@ -1,3 +1,3 @@
 module github.com/alessandrocuzzocrea/www2rss
 
-go 1.23.1
+go 1.5.0
