@@ -1,9 +1,11 @@
 version: "2"
 sql:
-  - engine: "sqlite"
-    queries: "db/queries"
-    schema: "db/migrations"
+  - engine: sqlite
+    queries: db/queries
+    schema: db/migrations
+    database:
+      uri: sqlite3://data/www2rss.sqlite3
     gen:
       go:
-        package: "tutorial"
-        out: "tutorial"
+        package: tutorial
+        out: tutorial
