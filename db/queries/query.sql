@@ -5,6 +5,10 @@ WHERE id = ? LIMIT 1;
 -- name: GetFirstFeed :one
 select * from feeds limit 1;
 
+-- name: UpsertFeedItem :exec
+INSERT OR REPLACE INTO feed_items (feed_id, title, description, link, updated_at)
+VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP);
+
 -- -- name: ListAuthors :many
 -- SELECT * FROM authors
 -- ORDER BY name;

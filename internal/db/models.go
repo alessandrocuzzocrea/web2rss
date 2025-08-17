@@ -14,8 +14,18 @@ type Feed struct {
 	Url                 string
 	ItemSelector        sql.NullString
 	TitleSelector       sql.NullString
+	LinkSelector        sql.NullString
 	DescriptionSelector sql.NullString
 	CreatedAt           sql.NullTime
-	CreatedUp           sql.NullTime
-	LinkSelector        sql.NullString
+	UpdatedAt           sql.NullTime
+}
+
+type FeedItem struct {
+	ID          interface{}
+	FeedID      int64
+	Title       string
+	Description sql.NullString
+	Link        string
+	CreatedAt   sql.NullTime
+	UpdatedAt   sql.NullTime
 }

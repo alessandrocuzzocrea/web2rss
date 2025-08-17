@@ -7,10 +7,11 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const getFeed = `-- name: GetFeed :one
-SELECT id, name, url, item_selector, title_selector, description_selector, created_at, created_up, link_selector FROM feeds
+SELECT id, name, url, item_selector, title_selector, link_selector, description_selector, created_at, updated_at FROM feeds
 WHERE id = ? LIMIT 1
 `
 
@@ -23,16 +24,16 @@ func (q *Queries) GetFeed(ctx context.Context, id interface{}) (Feed, error) {
 		&i.Url,
 		&i.ItemSelector,
 		&i.TitleSelector,
+		&i.LinkSelector,
 		&i.DescriptionSelector,
 		&i.CreatedAt,
-		&i.CreatedUp,
-		&i.LinkSelector,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getFirstFeed = `-- name: GetFirstFeed :one
-select id, name, url, item_selector, title_selector, description_selector, created_at, created_up, link_selector from feeds limit 1
+select id, name, url, item_selector, title_selector, link_selector, description_selector, created_at, updated_at from feeds limit 1
 `
 
 func (q *Queries) GetFirstFeed(ctx context.Context) (Feed, error) {
@@ -44,10 +45,32 @@ func (q *Queries) GetFirstFeed(ctx context.Context) (Feed, error) {
 		&i.Url,
 		&i.ItemSelector,
 		&i.TitleSelector,
+		&i.LinkSelector,
 		&i.DescriptionSelector,
 		&i.CreatedAt,
-		&i.CreatedUp,
-		&i.LinkSelector,
+		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const upsertFeedItem = `-- name: UpsertFeedItem :exec
+INSERT OR REPLACE INTO feed_items (feed_id, title, description, link, updated_at)
+VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+`
+
+type UpsertFeedItemParams struct {
+	FeedID      int64
+	Title       string
+	Description sql.NullString
+	Link        string
+}
+
+func (q *Queries) UpsertFeedItem(ctx context.Context, arg UpsertFeedItemParams) error {
+	_, err := q.db.ExecContext(ctx, upsertFeedItem,
+		arg.FeedID,
+		arg.Title,
+		arg.Description,
+		arg.Link,
+	)
+	return err
 }
