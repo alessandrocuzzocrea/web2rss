@@ -7,7 +7,10 @@ tool (
 	github.com/sqlc-dev/sqlc/cmd/sqlc
 )
 
-require github.com/mattn/go-sqlite3 v1.14.22
+require (
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
+	modernc.org/sqlite v1.38.2
+)
 
 require (
 	cel.dev/expr v0.19.1 // indirect
@@ -170,17 +173,17 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
-	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/crypto v0.39.0 // indirect
+	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b // indirect
+	golang.org/x/mod v0.25.0 // indirect
+	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/oauth2 v0.25.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/sync v0.15.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/term v0.32.0 // indirect
+	golang.org/x/text v0.26.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	golang.org/x/tools v0.31.0 // indirect
+	golang.org/x/tools v0.34.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/api v0.169.0 // indirect
 	google.golang.org/genproto v0.0.0-20240213162025-012b6fc9bca9 // indirect
@@ -194,16 +197,15 @@ require (
 	modernc.org/b v1.0.0 // indirect
 	modernc.org/db v1.0.0 // indirect
 	modernc.org/file v1.0.0 // indirect
-	modernc.org/fileutil v1.3.0 // indirect
+	modernc.org/fileutil v1.3.8 // indirect
 	modernc.org/golex v1.1.0 // indirect
 	modernc.org/internal v1.0.0 // indirect
-	modernc.org/libc v1.62.1 // indirect
+	modernc.org/libc v1.66.3 // indirect
 	modernc.org/lldb v1.0.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.9.1 // indirect
+	modernc.org/memory v1.11.0 // indirect
 	modernc.org/ql v1.0.0 // indirect
 	modernc.org/sortutil v1.2.1 // indirect
-	modernc.org/sqlite v1.37.0 // indirect
 	modernc.org/strutil v1.2.1 // indirect
 	modernc.org/zappy v1.0.0 // indirect
 )
