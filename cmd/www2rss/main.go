@@ -17,6 +17,6 @@ func main() {
 	if err = app.Run(); err != nil {
 		log.Fatalf("Application failed: %v", err)
 	}
-	
+
 	log.Println("www2rss application completed successfully")
 }
