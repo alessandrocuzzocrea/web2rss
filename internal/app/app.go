@@ -152,6 +152,13 @@ func (a *App) Run() error {
 		entryDescription := s.Text()
 
 		log.Printf("Entry %d: %s %s %s", i+1, entryTitle, entryLink, entryDescription)
+
+		a.queries.UpsertFeedItem(ctx, dbstore.UpsertFeedItemParams{
+			FeedID:      feed.ID,
+			Title:       entryTitle,
+			Description: sql.NullString{String: entryDescription, Valid: true},
+			Link:        entryLink,
+		})
 	})
 
 	// mux := a.Routes()

@@ -9,23 +9,23 @@ import (
 )
 
 type Feed struct {
-	ID                  int64
-	Name                string
-	Url                 string
-	ItemSelector        sql.NullString
-	TitleSelector       sql.NullString
-	LinkSelector        sql.NullString
-	DescriptionSelector sql.NullString
-	CreatedAt           sql.NullTime
-	UpdatedAt           sql.NullTime
+	ID                  int64          `json:"id"`
+	Name                string         `json:"name"`
+	Url                 string         `json:"url"`
+	ItemSelector        sql.NullString `json:"item_selector"`
+	TitleSelector       sql.NullString `json:"title_selector"`
+	LinkSelector        sql.NullString `json:"link_selector"`
+	DescriptionSelector sql.NullString `json:"description_selector"`
+	CreatedAt           sql.NullTime   `json:"created_at"`
+	UpdatedAt           sql.NullTime   `json:"updated_at"`
 }
 
 type FeedItem struct {
-	ID          int64
-	FeedID      int64
-	Title       string
-	Description sql.NullString
-	Link        string
-	CreatedAt   sql.NullTime
-	UpdatedAt   sql.NullTime
+	ID          int64          `json:"id"`
+	FeedID      int64          `json:"feed_id"`
+	Title       string         `json:"title"`
+	Description sql.NullString `json:"description"`
+	Link        string         `json:"link"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   sql.NullTime   `json:"updated_at"`
 }
