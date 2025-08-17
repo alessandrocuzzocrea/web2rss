@@ -17,4 +17,5 @@ type Feed struct {
 	DescriptionSelector sql.NullString
 	CreatedAt           sql.NullTime
 	CreatedUp           sql.NullTime
+	LinkSelector        sql.NullString
 }

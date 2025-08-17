@@ -10,7 +10,7 @@ import (
 )
 
 const getFeed = `-- name: GetFeed :one
-SELECT id, name, url, item_selector, title_selector, description_selector, created_at, created_up FROM feeds
+SELECT id, name, url, item_selector, title_selector, description_selector, created_at, created_up, link_selector FROM feeds
 WHERE id = ? LIMIT 1
 `
 
@@ -26,12 +26,13 @@ func (q *Queries) GetFeed(ctx context.Context, id interface{}) (Feed, error) {
 		&i.DescriptionSelector,
 		&i.CreatedAt,
 		&i.CreatedUp,
+		&i.LinkSelector,
 	)
 	return i, err
 }
 
 const getFirstFeed = `-- name: GetFirstFeed :one
-select id, name, url, item_selector, title_selector, description_selector, created_at, created_up from feeds limit 1
+select id, name, url, item_selector, title_selector, description_selector, created_at, created_up, link_selector from feeds limit 1
 `
 
 func (q *Queries) GetFirstFeed(ctx context.Context) (Feed, error) {
@@ -46,6 +47,7 @@ func (q *Queries) GetFirstFeed(ctx context.Context) (Feed, error) {
 		&i.DescriptionSelector,
 		&i.CreatedAt,
 		&i.CreatedUp,
+		&i.LinkSelector,
 	)
 	return i, err
 }
