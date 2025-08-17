@@ -151,8 +151,7 @@ func (a *App) Run() error {
 		entryLink := s.Find(feedItemLinkSelector).AttrOr("href", "")
 		entryDescription := s.Text()
 
-		log.Printf("Entry %d: %s %s %s", i+1, entryTitle, entryLink, entryDescription)
-
+		// log.Printf("Entry %d: %s %s %s", i+1, entryTitle, entryLink, entryDescription)
 		a.queries.UpsertFeedItem(ctx, dbstore.UpsertFeedItemParams{
 			FeedID:      feed.ID,
 			Title:       entryTitle,
@@ -161,14 +160,14 @@ func (a *App) Run() error {
 		})
 	})
 
-	// mux := a.Routes()
-	// port := ":8080" // Default port
+	mux := a.Routes()
+	port := ":8080" // Default port
 
-	// if err := http.ListenAndServe(port, mux); err != nil {
-	// 	return fmt.Errorf("HTTP server failed: %w", err)
-	// }
+	if err := http.ListenAndServe(port, mux); err != nil {
+		return fmt.Errorf("HTTP server failed: %w", err)
+	}
 
-	// log.Println("Server starting on :8080")
+	log.Println("Server starting on :8080")
 
 	return nil
 }

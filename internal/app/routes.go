@@ -22,5 +22,8 @@ func (a *App) Routes() *http.ServeMux {
 		fmt.Fprintf(w, `{"status": "healthy"}`)
 	})
 
+	// RSS feed endpoint
+	mux.HandleFunc("/feeds/", a.handleFeedRSS)
+
 	return mux
 }
