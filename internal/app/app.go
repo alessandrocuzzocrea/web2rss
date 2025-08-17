@@ -8,14 +8,14 @@ import (
 	"net/http"
 	"os"
 
-	dbstore "github.com/alessandrocuzzocrea/www2rss/internal/db"
+	"github.com/alessandrocuzzocrea/www2rss/internal/db"
 	_ "modernc.org/sqlite"
 )
 
 // App represents the main application
 type App struct {
 	db      *sql.DB
-	queries *dbstore.Queries
+	queries *db.Queries
 }
 
 // New creates a new instance of the application
@@ -25,19 +25,19 @@ func New() (*App, error) {
 		return nil, fmt.Errorf("failed to create data directory: %w", err)
 	}
 
-	db, err := sql.Open("sqlite", "./data/www2rss.sqlite3")
+	database, err := sql.Open("sqlite", "./data/www2rss.sqlite3")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
 	// Optional: set pool settings
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(5)
+	database.SetMaxOpenConns(10)
+	database.SetMaxIdleConns(5)
 
-	queries := dbstore.New(db)
+	queries := db.New(database)
 
 	return &App{
-		db:      db,
+		db:      database,
 		queries: queries,
 	}, nil
 }
@@ -160,11 +160,12 @@ func (a *App) Run() error {
 	a.StartFeedScheduler()
 
 	mux := a.Routes()
-	port := ":8080" // Default port
+	host := "localhost"
+	port := "8080"
 
 	log.Println("Server starting on :8080")
 
-	if err := http.ListenAndServe(port, mux); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), mux); err != nil {
 		return fmt.Errorf("HTTP server failed: %w", err)
 	}
 
