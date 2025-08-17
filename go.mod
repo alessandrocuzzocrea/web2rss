@@ -1,6 +1,6 @@
 module github.com/alessandrocuzzocrea/www2rss
 
-go 1.25.0
+go 1.24
 
 tool (
 	github.com/golang-migrate/migrate/v4/cmd/migrate
