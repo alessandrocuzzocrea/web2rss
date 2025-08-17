@@ -8,14 +8,14 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/alessandrocuzzocrea/www2rss/tutorial"
+	dbstore "github.com/alessandrocuzzocrea/www2rss/internal/db"
 	_ "modernc.org/sqlite"
 )
 
 // App represents the main application
 type App struct {
 	db      *sql.DB
-	queries *tutorial.Queries
+	queries *dbstore.Queries
 }
 
 // New creates a new instance of the application
@@ -34,7 +34,7 @@ func New() (*App, error) {
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(5)
 
-	queries := tutorial.New(db)
+	queries := dbstore.New(db)
 
 	return &App{
 		db:      db,
@@ -72,7 +72,7 @@ func (a *App) Run() error {
 	// Create queries instance
 
 	// Create author parameters (just for demo)
-	// tutorialParams := tutorial.CreateAuthorParams{
+	// dbstoreParams := dbstore.CreateAuthorParams{
 	// 	Name: "Test",
 	// 	Bio:  sql.NullString{String: "A sample author bio", Valid: true},
 	// 	Loller: sql.NullString{String: "A sample loller", Valid: true},

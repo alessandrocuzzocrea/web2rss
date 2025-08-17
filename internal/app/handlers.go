@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/alessandrocuzzocrea/www2rss/tutorial"
+	dbstore "github.com/alessandrocuzzocrea/www2rss/internal/db"
 )
 
 // Health check handler
@@ -46,7 +46,7 @@ func (a *App) handleCreateAuthor(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	params := tutorial.CreateAuthorParams{
+	params := dbstore.CreateAuthorParams{
 		Name:   input.Name,
 		Bio:    sql.NullString{String: input.Bio, Valid: input.Bio != ""},
 		Loller: sql.NullString{String: input.Loller, Valid: input.Loller != ""},
