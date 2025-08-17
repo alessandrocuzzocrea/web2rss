@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -32,17 +31,11 @@ type Item struct {
 	PubDate     string `xml:"pubDate,omitempty"`
 }
 
-// GET /feeds/{id}/ - Generate RSS XML for a feed
+// GET /feed/{id}/ - Generate RSS XML for a feed
 func (a *App) handleFeedRSS(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	// Extract feed ID from URL path (e.g., /feeds/1/)
-	path := strings.TrimPrefix(r.URL.Path, "/feeds/")
-	idStr := strings.TrimSuffix(path, "/")
-	if idStr == "" {
-		http.Error(w, "Invalid feed ID", http.StatusBadRequest)
-		return
-	}
+	idStr := r.PathValue("id")
 
 	feedID, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
