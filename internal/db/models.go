@@ -8,9 +8,13 @@ import (
 	"database/sql"
 )
 
-type Author struct {
-	ID     int64
-	Name   string
-	Bio    sql.NullString
-	Loller sql.NullString
+type Feed struct {
+	ID                  interface{}
+	Name                string
+	Url                 string
+	ItemSelector        sql.NullString
+	TitleSelector       sql.NullString
+	DescriptionSelector sql.NullString
+	CreatedAt           sql.NullTime
+	CreatedUp           sql.NullTime
 }

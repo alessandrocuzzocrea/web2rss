@@ -7,110 +7,45 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
-const createAuthor = `-- name: CreateAuthor :one
-INSERT INTO authors (
-  name, bio, loller
-) VALUES (
-  ?, ?, ?
-)
-RETURNING id, name, bio, loller
-`
-
-type CreateAuthorParams struct {
-	Name   string
-	Bio    sql.NullString
-	Loller sql.NullString
-}
-
-func (q *Queries) CreateAuthor(ctx context.Context, arg CreateAuthorParams) (Author, error) {
-	row := q.db.QueryRowContext(ctx, createAuthor, arg.Name, arg.Bio, arg.Loller)
-	var i Author
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Bio,
-		&i.Loller,
-	)
-	return i, err
-}
-
-const deleteAuthor = `-- name: DeleteAuthor :exec
-DELETE FROM authors
-WHERE id = ?
-`
-
-func (q *Queries) DeleteAuthor(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteAuthor, id)
-	return err
-}
-
-const getAuthor = `-- name: GetAuthor :one
-SELECT id, name, bio, loller FROM authors
+const getFeed = `-- name: GetFeed :one
+SELECT id, name, url, item_selector, title_selector, description_selector, created_at, created_up FROM feeds
 WHERE id = ? LIMIT 1
 `
 
-func (q *Queries) GetAuthor(ctx context.Context, id int64) (Author, error) {
-	row := q.db.QueryRowContext(ctx, getAuthor, id)
-	var i Author
+func (q *Queries) GetFeed(ctx context.Context, id interface{}) (Feed, error) {
+	row := q.db.QueryRowContext(ctx, getFeed, id)
+	var i Feed
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.Bio,
-		&i.Loller,
+		&i.Url,
+		&i.ItemSelector,
+		&i.TitleSelector,
+		&i.DescriptionSelector,
+		&i.CreatedAt,
+		&i.CreatedUp,
 	)
 	return i, err
 }
 
-const listAuthors = `-- name: ListAuthors :many
-SELECT id, name, bio, loller FROM authors
-ORDER BY name
+const getFirstFeed = `-- name: GetFirstFeed :one
+select id, name, url, item_selector, title_selector, description_selector, created_at, created_up from feeds limit 1
 `
 
-func (q *Queries) ListAuthors(ctx context.Context) ([]Author, error) {
-	rows, err := q.db.QueryContext(ctx, listAuthors)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Author
-	for rows.Next() {
-		var i Author
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Bio,
-			&i.Loller,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const updateAuthor = `-- name: UpdateAuthor :exec
-UPDATE authors
-set name = ?,
-bio = ?
-WHERE id = ?
-`
-
-type UpdateAuthorParams struct {
-	Name string
-	Bio  sql.NullString
-	ID   int64
-}
-
-func (q *Queries) UpdateAuthor(ctx context.Context, arg UpdateAuthorParams) error {
-	_, err := q.db.ExecContext(ctx, updateAuthor, arg.Name, arg.Bio, arg.ID)
-	return err
+func (q *Queries) GetFirstFeed(ctx context.Context) (Feed, error) {
+	row := q.db.QueryRowContext(ctx, getFirstFeed)
+	var i Feed
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Url,
+		&i.ItemSelector,
+		&i.TitleSelector,
+		&i.DescriptionSelector,
+		&i.CreatedAt,
+		&i.CreatedUp,
+	)
+	return i, err
 }
