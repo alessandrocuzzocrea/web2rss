@@ -4,7 +4,8 @@ CREATE TABLE feeds (
     url TEXT NOT NULL,
     item_selector TEXT,
     title_selector TEXT,
+    link_selector TEXT,
     description_selector TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_up TIMESTAMP DEFAULT NULL
+    updated_at TIMESTAMP DEFAULT NULL
 );
