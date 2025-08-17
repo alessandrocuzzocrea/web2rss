@@ -131,15 +131,24 @@ func (a *App) Run() error {
 	}
 
 	feedItemSelector := ""
-
 	if feed.ItemSelector.Valid {
 		feedItemSelector = feed.ItemSelector.String
 	}
 
+	feedItemTitleSelector := ""
+	if feed.TitleSelector.Valid {
+		feedItemTitleSelector = feed.TitleSelector.String
+	}
+
+	feedItemLinkSelector := ""
+	if feed.LinkSelector.Valid {
+		feedItemLinkSelector = feed.LinkSelector.String
+	}
+
 	// Find the event elements
 	doc.Find(feedItemSelector).Each(func(i int, s *goquery.Selection) {
-		entryTitle := s.Find("h4 a").Text()
-		entryLink := s.Find("h4 a").AttrOr("href", "")
+		entryTitle := s.Find(feedItemTitleSelector).Text()
+		entryLink := s.Find(feedItemLinkSelector).AttrOr("href", "")
 		entryDescription := s.Text()
 
 		log.Printf("Entry %d: %s %s %s", i+1, entryTitle, entryLink, entryDescription)
