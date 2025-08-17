@@ -1,25 +1,28 @@
--- name: GetAuthor :one
-SELECT * FROM authors
+-- name: GetFeed :one
+SELECT * FROM feeds
 WHERE id = ? LIMIT 1;
 
--- name: ListAuthors :many
-SELECT * FROM authors
-ORDER BY name;
+-- name: GetFirstFeed :one
+select * from feeds limit 1;
 
--- name: CreateAuthor :one
-INSERT INTO authors (
-  name, bio, loller
-) VALUES (
-  ?, ?, ?
-)
-RETURNING *;
+-- -- name: ListAuthors :many
+-- SELECT * FROM authors
+-- ORDER BY name;
 
--- name: UpdateAuthor :exec
-UPDATE authors
-set name = ?,
-bio = ?
-WHERE id = ?;
+-- -- name: CreateAuthor :one
+-- INSERT INTO authors (
+--   name, bio, loller
+-- ) VALUES (
+--   ?, ?, ?
+-- )
+-- RETURNING *;
 
--- name: DeleteAuthor :exec
-DELETE FROM authors
-WHERE id = ?;
+-- -- name: UpdateAuthor :exec
+-- UPDATE authors
+-- set name = ?,
+-- bio = ?
+-- WHERE id = ?;
+
+-- -- name: DeleteAuthor :exec
+-- DELETE FROM authors
+-- WHERE id = ?;
