@@ -12,6 +12,8 @@ require (
 	modernc.org/sqlite v1.38.2
 )
 
+require github.com/PuerkitoBio/goquery v1.10.3
+
 require (
 	cel.dev/expr v0.19.1 // indirect
 	cloud.google.com/go v0.112.1 // indirect
@@ -33,6 +35,7 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/ClickHouse/clickhouse-go v1.4.3 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
+	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/apache/arrow/go/v10 v10.0.1 // indirect
 	github.com/apache/thrift v0.16.0 // indirect
