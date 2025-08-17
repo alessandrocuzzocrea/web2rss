@@ -1,19 +1,15 @@
 package app
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
 
 	dbstore "github.com/alessandrocuzzocrea/www2rss/internal/db"
 	_ "modernc.org/sqlite"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 // App represents the main application
@@ -91,83 +87,86 @@ func (a *App) Run() error {
 	// log.Printf("Created author: %+v", author)
 
 	// lets grab the first row of feeds table
-	feed, err := a.queries.GetFeed(ctx, 1)
-	if err != nil {
-		log.Printf("No feeds found: %v", err)
-	} else {
-		log.Printf("First feed: %+v", feed)
-	}
+	// feed, err := a.queries.GetFeed(ctx, 1)
+	// if err != nil {
+	// 	log.Printf("No feeds found: %v", err)
+	// } else {
+	// 	log.Printf("First feed: %+v", feed)
+	// }
 
-	log.Printf("Feed URL: %s", feed.Url)
+	// log.Printf("Feed URL: %s", feed.Url)
 
-	// get the url body
-	resp, err := http.Get(feed.Url)
-	if err != nil {
-		log.Printf("Failed to get feed URL: %v", err)
-		return err
-	}
-	defer resp.Body.Close()
+	// // get the url body
+	// resp, err := http.Get(feed.Url)
+	// if err != nil {
+	// 	log.Printf("Failed to get feed URL: %v", err)
+	// 	return err
+	// }
+	// defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		log.Printf("Failed to get feed URL: %s", resp.Status)
-		return fmt.Errorf("failed to get feed URL: %s", resp.Status)
-	}
+	// if resp.StatusCode != http.StatusOK {
+	// 	log.Printf("Failed to get feed URL: %s", resp.Status)
+	// 	return fmt.Errorf("failed to get feed URL: %s", resp.Status)
+	// }
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Printf("Failed to read feed body: %v", err)
-		return err
-	}
+	// body, err := io.ReadAll(resp.Body)
+	// if err != nil {
+	// 	log.Printf("Failed to read feed body: %v", err)
+	// 	return err
+	// }
 
-	log.Printf("Feed body: %s", body)
+	// log.Printf("Feed body: %s", body)
 
 	// extract this html with this select: <div class="event">
 
 	// Create a new HTML document
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
-	if err != nil {
-		log.Printf("Failed to parse feed body as HTML: %v", err)
-		return err
-	}
+	// doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
+	// if err != nil {
+	// 	log.Printf("Failed to parse feed body as HTML: %v", err)
+	// 	return err
+	// }
 
-	feedItemSelector := ""
-	if feed.ItemSelector.Valid {
-		feedItemSelector = feed.ItemSelector.String
-	}
+	// feedItemSelector := ""
+	// if feed.ItemSelector.Valid {
+	// 	feedItemSelector = feed.ItemSelector.String
+	// }
 
-	feedItemTitleSelector := ""
-	if feed.TitleSelector.Valid {
-		feedItemTitleSelector = feed.TitleSelector.String
-	}
+	// feedItemTitleSelector := ""
+	// if feed.TitleSelector.Valid {
+	// 	feedItemTitleSelector = feed.TitleSelector.String
+	// }
 
-	feedItemLinkSelector := ""
-	if feed.LinkSelector.Valid {
-		feedItemLinkSelector = feed.LinkSelector.String
-	}
+	// feedItemLinkSelector := ""
+	// if feed.LinkSelector.Valid {
+	// 	feedItemLinkSelector = feed.LinkSelector.String
+	// }
 
 	// Find the event elements
-	doc.Find(feedItemSelector).Each(func(i int, s *goquery.Selection) {
-		entryTitle := s.Find(feedItemTitleSelector).Text()
-		entryLink := s.Find(feedItemLinkSelector).AttrOr("href", "")
-		entryDescription := s.Text()
+	// doc.Find(feedItemSelector).Each(func(i int, s *goquery.Selection) {
+	// 	entryTitle := s.Find(feedItemTitleSelector).Text()
+	// 	entryLink := s.Find(feedItemLinkSelector).AttrOr("href", "")
+	// 	entryDescription := s.Text()
 
-		// log.Printf("Entry %d: %s %s %s", i+1, entryTitle, entryLink, entryDescription)
-		a.queries.UpsertFeedItem(ctx, dbstore.UpsertFeedItemParams{
-			FeedID:      feed.ID,
-			Title:       entryTitle,
-			Description: sql.NullString{String: entryDescription, Valid: true},
-			Link:        entryLink,
-		})
-	})
+	// 	// log.Printf("Entry %d: %s %s %s", i+1, entryTitle, entryLink, entryDescription)
+	// 	a.queries.UpsertFeedItem(ctx, dbstore.UpsertFeedItemParams{
+	// 		FeedID:      feed.ID,
+	// 		Title:       entryTitle,
+	// 		Description: sql.NullString{String: entryDescription, Valid: true},
+	// 		Link:        entryLink,
+	// 	})
+	// })
+
+	// Start the feed scheduler (refreshes feeds every hour)
+	a.StartFeedScheduler()
 
 	mux := a.Routes()
 	port := ":8080" // Default port
 
+	log.Println("Server starting on :8080")
+
 	if err := http.ListenAndServe(port, mux); err != nil {
 		return fmt.Errorf("HTTP server failed: %w", err)
 	}
-
-	log.Println("Server starting on :8080")
 
 	return nil
 }
