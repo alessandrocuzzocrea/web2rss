@@ -15,7 +15,7 @@ SELECT id, name, url, item_selector, title_selector, link_selector, description_
 WHERE id = ? LIMIT 1
 `
 
-func (q *Queries) GetFeed(ctx context.Context, id interface{}) (Feed, error) {
+func (q *Queries) GetFeed(ctx context.Context, id int64) (Feed, error) {
 	row := q.db.QueryRowContext(ctx, getFeed, id)
 	var i Feed
 	err := row.Scan(

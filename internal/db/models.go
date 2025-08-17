@@ -9,7 +9,7 @@ import (
 )
 
 type Feed struct {
-	ID                  interface{}
+	ID                  int64
 	Name                string
 	Url                 string
 	ItemSelector        sql.NullString
@@ -21,7 +21,7 @@ type Feed struct {
 }
 
 type FeedItem struct {
-	ID          interface{}
+	ID          int64
 	FeedID      int64
 	Title       string
 	Description sql.NullString

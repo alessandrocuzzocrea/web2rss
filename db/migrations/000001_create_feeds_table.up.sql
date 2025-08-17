@@ -1,5 +1,5 @@
 CREATE TABLE feeds (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     url TEXT NOT NULL,
     item_selector TEXT,
