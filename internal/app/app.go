@@ -91,7 +91,7 @@ func (a *App) Run() error {
 	// log.Printf("Created author: %+v", author)
 
 	// lets grab the first row of feeds table
-	feed, err := a.queries.GetFirstFeed(ctx)
+	feed, err := a.queries.GetFeed(ctx, 1)
 	if err != nil {
 		log.Printf("No feeds found: %v", err)
 	} else {
