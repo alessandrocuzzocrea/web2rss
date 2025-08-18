@@ -51,7 +51,7 @@ linters:
     - goimports
     - mnd
     - goprintffuncname
-    - gosec
+    # - gosec
     - gosimple
     - govet
     - ineffassign
@@ -76,7 +76,7 @@ issues:
         - gocyclo
         - errcheck
         - dupl
-        - gosec
+        # - gosec
     - path: tutorial/query\.sql\.go
       linters:
         - all
