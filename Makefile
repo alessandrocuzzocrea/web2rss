@@ -9,9 +9,12 @@ BINARY_NAME=www2rss
 BINARY_UNIX=$(BINARY_NAME)_unix
 DOCKER_IMAGE=www2rss:latest
 
-.PHONY: all build clean test coverage deps docker docker-run help
+.PHONY: all build clean test coverage deps docker docker-run help dev lint migrate-up migrate-down sqlc-generate
 
 all: deps test build ## Run deps, test and build
+
+dev: ## Start development server with hot reload
+	air -c .air.toml
 
 build: ## Build the binary file
 	$(GOBUILD) -o $(BINARY_NAME) -v ./cmd/www2rss
@@ -65,8 +68,16 @@ lint: ## Run golangci-lint
 	golangci-lint run
 
 # Database commands
-db-migrate: ## Run database migrations (placeholder)
-	@echo "Database migrations would go here"
+migrate-up: ## Run database migrations up
+	migrate -database "sqlite://data/www2rss.sqlite3" -path db/migrations up
+
+migrate-down: ## Run database migrations down
+	migrate -database "sqlite://data/www2rss.sqlite3" -path db/migrations down
+
+sqlc-generate: ## Generate SQLC code
+	sqlc generate
+
+setup-db: migrate-up sqlc-generate ## Setup database (migrate + generate code)
 
 # Help
 help: ## Display this help screen

@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/alessandrocuzzocrea/www2rss/internal/db"
 	_ "modernc.org/sqlite"
@@ -14,8 +16,10 @@ import (
 
 // App represents the main application
 type App struct {
-	db      *sql.DB
-	queries *db.Queries
+	db        *sql.DB
+	queries   *db.Queries
+	templates *template.Template
+	startTime time.Time
 }
 
 // New creates a new instance of the application
@@ -36,9 +40,17 @@ func New() (*App, error) {
 
 	queries := db.New(database)
 
+	// Load templates
+	templates, err := template.ParseGlob("templates/*.html")
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse templates: %w", err)
+	}
+
 	return &App{
-		db:      database,
-		queries: queries,
+		db:        database,
+		queries:   queries,
+		templates: templates,
+		startTime: time.Now(),
 	}, nil
 }
 
@@ -69,94 +81,6 @@ func (a *App) Run() error {
 
 	log.Println("Database connection established")
 
-	// Create queries instance
-
-	// Create author parameters (just for demo)
-	// dbstoreParams := dbstore.CreateAuthorParams{
-	// 	Name: "Test",
-	// 	Bio:  sql.NullString{String: "A sample author bio", Valid: true},
-	// 	Loller: sql.NullString{String: "A sample loller", Valid: true},
-	// }
-
-	// Create author in database (just for demo)
-	// author, err := queries.CreateAuthor(ctx, tutorialParams)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to create author: %w", err)
-	// }
-
-	// log.Printf("Created author: %+v", author)
-
-	// lets grab the first row of feeds table
-	// feed, err := a.queries.GetFeed(ctx, 1)
-	// if err != nil {
-	// 	log.Printf("No feeds found: %v", err)
-	// } else {
-	// 	log.Printf("First feed: %+v", feed)
-	// }
-
-	// log.Printf("Feed URL: %s", feed.Url)
-
-	// // get the url body
-	// resp, err := http.Get(feed.Url)
-	// if err != nil {
-	// 	log.Printf("Failed to get feed URL: %v", err)
-	// 	return err
-	// }
-	// defer resp.Body.Close()
-
-	// if resp.StatusCode != http.StatusOK {
-	// 	log.Printf("Failed to get feed URL: %s", resp.Status)
-	// 	return fmt.Errorf("failed to get feed URL: %s", resp.Status)
-	// }
-
-	// body, err := io.ReadAll(resp.Body)
-	// if err != nil {
-	// 	log.Printf("Failed to read feed body: %v", err)
-	// 	return err
-	// }
-
-	// log.Printf("Feed body: %s", body)
-
-	// extract this html with this select: <div class="event">
-
-	// Create a new HTML document
-	// doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
-	// if err != nil {
-	// 	log.Printf("Failed to parse feed body as HTML: %v", err)
-	// 	return err
-	// }
-
-	// feedItemSelector := ""
-	// if feed.ItemSelector.Valid {
-	// 	feedItemSelector = feed.ItemSelector.String
-	// }
-
-	// feedItemTitleSelector := ""
-	// if feed.TitleSelector.Valid {
-	// 	feedItemTitleSelector = feed.TitleSelector.String
-	// }
-
-	// feedItemLinkSelector := ""
-	// if feed.LinkSelector.Valid {
-	// 	feedItemLinkSelector = feed.LinkSelector.String
-	// }
-
-	// Find the event elements
-	// doc.Find(feedItemSelector).Each(func(i int, s *goquery.Selection) {
-	// 	entryTitle := s.Find(feedItemTitleSelector).Text()
-	// 	entryLink := s.Find(feedItemLinkSelector).AttrOr("href", "")
-	// 	entryDescription := s.Text()
-
-	// 	// log.Printf("Entry %d: %s %s %s", i+1, entryTitle, entryLink, entryDescription)
-	// 	a.queries.UpsertFeedItem(ctx, dbstore.UpsertFeedItemParams{
-	// 		FeedID:      feed.ID,
-	// 		Title:       entryTitle,
-	// 		Description: sql.NullString{String: entryDescription, Valid: true},
-	// 		Link:        entryLink,
-	// 	})
-	// })
-
-	// Start the feed scheduler (refreshes feeds every hour)
 	a.StartFeedScheduler()
 
 	mux := a.Routes()
