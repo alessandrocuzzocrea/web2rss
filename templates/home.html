@@ -40,6 +40,7 @@
                   <th>Created At</th>
                   <th>Last Refresh</th>
                   <th>Total feed count</th>
+                  <th>RSS</th>
                   <th>Edit</th>
                 </tr>
           </thead>
@@ -52,11 +53,12 @@
                   <td>{{.CreatedAt}}</td>
                   <td>#todo</td>
                   <td>#todo</td>
+                  <td><a href="/feed/{{.ID}}/rss" target="_blank">RSS</a></td>
                   <td><a href="/feed/{{.ID}}/edit">Edit</a></td>
               </tr>
               {{else}}
               <tr>
-                  <td colspan="6">No feeds available</td>
+                  <td colspan="7">No feeds available</td>
               </tr>
               {{end}}
           </tbody>

@@ -25,7 +25,7 @@ func (a *App) Routes() *http.ServeMux {
 
 	// Feed endpoints
 	// mux.HandleFunc("/feeds/", a.handleListFeeds)  // List all feeds
-	mux.HandleFunc("GET /feed/{id}/", a.handleFeedRSS) // Get RSS for specific feed
+	mux.HandleFunc("GET /feed/{id}/rss", a.handleFeedRSS) // Get RSS for specific feed
 
 	return mux
 }

@@ -39,6 +39,7 @@ func (a *App) handleFeedRSS(w http.ResponseWriter, r *http.Request) {
 
 	feedID, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
+		fmt.Printf("Invalid feed ID: %v\n", err)
 		http.Error(w, "Invalid feed ID", http.StatusBadRequest)
 		return
 	}
