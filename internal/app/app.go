@@ -86,12 +86,12 @@ func (a *App) Run() error {
 	a.StartFeedScheduler()
 
 	mux := a.Routes()
-	host := "localhost"
+	// host := "localhost"
 	port := "8080"
 
 	log.Println("Server starting on :8080")
 
-	if err := http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), mux); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), mux); err != nil {
 		return fmt.Errorf("HTTP server failed: %w", err)
 	}
 
