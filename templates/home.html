@@ -1,4 +1,13 @@
 {{define "content"}}
+<h2> Add new feed</h2>
+<form action="/feed/" method="post">
+    <label for="name">Feed Name:</label><br>
+    <input type="text" id="name" name="name" required><br><br>
+    <label for="url">Website URL:</label><br>
+    <input type="url" id="url" name="url" required><br><br>
+    <input type="submit" value="Create Feed">
+</form>
+
 <h2>Feeds</h2>
 <table border="1" cellpadding="5" cellspacing="0">
     <thead>
@@ -7,7 +16,9 @@
             <th>Name</th>
             <th>URL</th>
             <th>Created At</th>
-        </tr>
+            <th>Last Refresh</th>
+            <th>Total feed count</th>
+          </tr>
     </thead>
     <tbody>
         {{range .Feeds}}
@@ -16,10 +27,12 @@
             <td>{{.Name}}</td>
             <td><a href="{{.Url}}" target="_blank">{{.Url}}</a></td>
             <td>{{.CreatedAt}}</td>
+            <td>#todo</td>
+            <td>#todo</td>
         </tr>
         {{else}}
         <tr>
-            <td colspan="4">No feeds available</td>
+            <td colspan="6">No feeds available</td>
         </tr>
         {{end}}
     </tbody>

@@ -56,6 +56,19 @@ func (a *App) refreshAllFeeds() {
 
 // refreshFeed fetches and updates a single feed
 func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
+
+	if feed.ItemSelector.Valid == false {
+		return fmt.Errorf("feed %d is missing item selector", feed.ID)
+	}
+
+	if feed.TitleSelector.Valid == false {
+		return fmt.Errorf("feed %d is missing title selector", feed.ID)
+	}
+
+	if feed.LinkSelector.Valid == false {
+		return fmt.Errorf("feed %d is missing link selector", feed.ID)
+	}
+
 	// Fetch the webpage
 	resp, err := http.Get(feed.Url)
 	if err != nil {

@@ -12,6 +12,8 @@ func (a *App) Routes() *http.ServeMux {
 	// Homepage with HTML template
 	mux.HandleFunc("/", a.handleHomepage)
 
+	mux.HandleFunc("POST /feed/", a.handleCreateFeed)
+
 	// Add a health endpoint
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
