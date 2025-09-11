@@ -71,10 +71,29 @@ func (a *App) handleEditFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var data = struct {
+		ID                  int64
+		Name                string
+		Url                 string
+		ItemSelector        string
+		TitleSelector       string
+		LinkSelector        string
+		DescriptionSelector string
+		// other fields as needed
+	}{
+		ID:                  feed.ID,
+		Name:                feed.Name,
+		Url:                 feed.Url,
+		ItemSelector:        nullStringToString(feed.ItemSelector),
+		TitleSelector:       nullStringToString(feed.TitleSelector),
+		LinkSelector:        nullStringToString(feed.LinkSelector),
+		DescriptionSelector: nullStringToString(feed.DescriptionSelector),
+	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	// Execute the template
-	if err := a.templates.ExecuteTemplate(w, "edit_feed.html", feed); err != nil {
+	if err := a.templates.ExecuteTemplate(w, "edit_feed.html", data); err != nil {
 		//print the err
 		fmt.Printf("Template error: %v\n", err)
 		http.Error(w, "Template error", http.StatusInternalServerError)
@@ -130,4 +149,18 @@ func (a *App) handleUpdateFeed(w http.ResponseWriter, r *http.Request) {
 
 	// Redirect back to the homepage after successful update
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func nullStringToString(ns sql.NullString) string {
+	if ns.Valid {
+		return ns.String
+	}
+	return ""
+}
+
+func stringToNullString(s string) sql.NullString {
+	if s == "" {
+		return sql.NullString{Valid: false}
+	}
+	return sql.NullString{String: s, Valid: true}
 }
