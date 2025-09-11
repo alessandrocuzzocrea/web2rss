@@ -134,16 +134,6 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 		}
 	})
 
-	// Clean up old items (keep only last 100 items per feed)
-	// cutoffTime := time.Now().AddDate(0, 0, -30) // Keep items from last 30 days
-	// err = a.queries.DeleteOldFeedItems(ctx, db.DeleteOldFeedItemsParams{
-	// 	FeedID:    feed.ID,
-	// 	CreatedAt: db.NewNullTime(cutoffTime),
-	// })
-	// if err != nil {
-	// 	log.Printf("Failed to clean up old items for feed %d: %v", feed.ID, err)
-	// }
-
 	log.Printf("Feed %d: processed %d items", feed.ID, newItemsCount)
 	return nil
 }

@@ -21,7 +21,7 @@ func (q *Queries) DeleteFeedItem(ctx context.Context, id int64) error {
 }
 
 const deleteOldFeedItems = `-- name: DeleteOldFeedItems :exec
-DELETE FROM feed_items 
+DELETE FROM feed_items
 WHERE feed_id = ? AND created_at < ?
 `
 
@@ -93,8 +93,12 @@ func (q *Queries) ListFeedItems(ctx context.Context, feedID int64) ([]FeedItem, 
 }
 
 const upsertFeedItem = `-- name: UpsertFeedItem :exec
-INSERT OR REPLACE INTO feed_items (feed_id, title, description, link, updated_at)
+INSERT INTO feed_items (feed_id, title, description, link, updated_at)
 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+ON CONFLICT(feed_id, link) DO UPDATE SET
+    title = excluded.title,
+    description = excluded.description,
+    updated_at = CURRENT_TIMESTAMP
 `
 
 type UpsertFeedItemParams struct {
