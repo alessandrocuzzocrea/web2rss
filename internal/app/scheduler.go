@@ -88,6 +88,7 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 
 	// Extract items using selectors
 	var newItemsCount int
+	var count []int64
 	doc.Find(feed.ItemSelector.String).Each(func(i int, s *goquery.Selection) {
 		title := strings.TrimSpace(s.Find(feed.TitleSelector.String).Text())
 		link, exists := s.Find(feed.LinkSelector.String).Attr("href")
@@ -120,7 +121,7 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 		}
 
 		// Upsert the item (will update if exists, insert if new)
-		err := a.queries.UpsertFeedItem(ctx, db.UpsertFeedItemParams{
+		count, err = a.queries.UpsertFeedItem(ctx, db.UpsertFeedItemParams{
 			FeedID:      feed.ID,
 			Title:       title,
 			Description: db.NewNullString(description),
@@ -134,6 +135,6 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 		}
 	})
 
-	log.Printf("Feed %d: processed %d items", feed.ID, newItemsCount)
+	log.Printf("Feed %d: processed %d items. Upserted %d new items.", feed.ID, newItemsCount, len(count))
 	return nil
 }

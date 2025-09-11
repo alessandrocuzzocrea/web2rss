@@ -92,13 +92,11 @@ func (q *Queries) ListFeedItems(ctx context.Context, feedID int64) ([]FeedItem, 
 	return items, nil
 }
 
-const upsertFeedItem = `-- name: UpsertFeedItem :exec
+const upsertFeedItem = `-- name: UpsertFeedItem :many
 INSERT INTO feed_items (feed_id, title, description, link, updated_at)
 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-ON CONFLICT(feed_id, link) DO UPDATE SET
-    title = excluded.title,
-    description = excluded.description,
-    updated_at = CURRENT_TIMESTAMP
+ON CONFLICT(feed_id, link) DO NOTHING
+RETURNING id
 `
 
 type UpsertFeedItemParams struct {
@@ -108,12 +106,30 @@ type UpsertFeedItemParams struct {
 	Link        string         `json:"link"`
 }
 
-func (q *Queries) UpsertFeedItem(ctx context.Context, arg UpsertFeedItemParams) error {
-	_, err := q.db.ExecContext(ctx, upsertFeedItem,
+func (q *Queries) UpsertFeedItem(ctx context.Context, arg UpsertFeedItemParams) ([]int64, error) {
+	rows, err := q.db.QueryContext(ctx, upsertFeedItem,
 		arg.FeedID,
 		arg.Title,
 		arg.Description,
 		arg.Link,
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []int64
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
