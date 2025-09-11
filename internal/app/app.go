@@ -46,12 +46,14 @@ func New() (*App, error) {
 		return nil, fmt.Errorf("failed to parse templates: %w", err)
 	}
 
-	return &App{
+	app := &App{
 		db:        database,
 		queries:   queries,
 		templates: templates,
 		startTime: time.Now(),
-	}, nil
+	}
+
+	return app, nil
 }
 
 func (a *App) Close() error {
