@@ -1,0 +1,64 @@
+{{define "content"}}
+<div class="hero">
+    <div class="container">
+        <h1>🌐 www2rss</h1>
+        <p>Convert any website into RSS feeds</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="grid">
+        <div class="card">
+            <h2>🚀 Welcome to www2rss</h2>
+            <p>Transform any website into an RSS feed for easy consumption in your favorite RSS reader.</p>
+            <p><strong>Status:</strong> <span class="status healthy">✅ Healthy</span></p>
+        </div>
+
+        <div class="card">
+            <h2>📡 Available Feeds</h2>
+            <p>Browse and subscribe to RSS feeds generated from various websites.</p>
+            <a href="/feeds" class="btn">View All Feeds</a>
+        </div>
+
+        <div class="card">
+            <h2>🔧 API Endpoints</h2>
+            <ul style="margin: 1rem 0;">
+                <li><code>GET /health</code> - Service health check</li>
+                <li><code>GET /feed/{id}/</code> - Get RSS feed by ID</li>
+                <li><code>GET /feeds/</code> - List all available feeds</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>📊 System Information</h2>
+            <ul style="margin: 1rem 0;">
+                <li><strong>Version:</strong> {{.Version}}</li>
+                <li><strong>Go Version:</strong> {{.GoVersion}}</li>
+                <li><strong>Build Time:</strong> {{.BuildTime}}</li>
+                <li><strong>Uptime:</strong> {{.Uptime}}</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🚀 Quick Start</h2>
+            <p>Get started with www2rss in just a few steps:</p>
+            <ol style="margin: 1rem 0; padding-left: 1.5rem;">
+                <li>Add a website URL to monitor</li>
+                <li>Configure RSS feed parameters</li>
+                <li>Subscribe to the generated RSS feed</li>
+                <li>Enjoy automated updates in your RSS reader!</li>
+            </ol>
+        </div>
+
+        <div class="card">
+            <h2>📖 Documentation</h2>
+            <p>Learn how to use www2rss effectively:</p>
+            <ul style="margin: 1rem 0;">
+                <li><a href="/docs/api">API Reference</a></li>
+                <li><a href="/docs/examples">Usage Examples</a></li>
+                <li><a href="/docs/faq">FAQ</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{{end}}

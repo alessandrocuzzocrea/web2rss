@@ -9,11 +9,8 @@ import (
 func (a *App) Routes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	// Add a simple health check endpoint
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintf(w, `{"message": "www2rss is running!", "all": "lol"}`)
-	})
+	// Homepage with HTML template
+	mux.HandleFunc("/", a.handleHomepage)
 
 	// Add a health endpoint
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
