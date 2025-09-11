@@ -1,42 +1,78 @@
-{{define "content"}}
-<h2> Add new feed</h2>
-<form action="/feed/" method="post">
-    <label for="name">Feed Name:</label><br>
-    <input type="text" id="name" name="name" required><br><br>
-    <label for="url">Website URL:</label><br>
-    <input type="url" id="url" name="url" required><br><br>
-    <input type="submit" value="Create Feed">
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - www2rss</title>
+    <meta name="description" content="Convert websites to RSS feeds">
+</head>
+<body>
+    <header>
+        <div>
+            <a href="/">🌐 www2rss</a>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/feeds">Feeds</a></li>
+                    <li><a href="/health">Health</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-<h2>Feeds</h2>
-<table border="1" cellpadding="5" cellspacing="0">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>URL</th>
-            <th>Created At</th>
-            <th>Last Refresh</th>
-            <th>Total feed count</th>
-            <th>Edit</th>
-          </tr>
-    </thead>
-    <tbody>
-        {{range .Feeds}}
-        <tr>
-            <td>{{.ID}}</td>
-            <td>{{.Name}}</td>
-            <td><a href="{{.Url}}" target="_blank">{{.Url}}</a></td>
-            <td>{{.CreatedAt}}</td>
-            <td>#todo</td>
-            <td>#todo</td>
-            <td><a href="/feed/{{.ID}}/edit">Edit</a></td>
-        </tr>
-        {{else}}
-        <tr>
-            <td colspan="6">No feeds available</td>
-        </tr>
-        {{end}}
-    </tbody>
-</table>
-{{end}}
+    <main>
+        <h2> Add new feed</h2>
+          <form action="/feed/" method="post">
+              <label for="name">Feed Name:</label><br>
+              <input type="text" id="name" name="name" required><br><br>
+              <label for="url">Website URL:</label><br>
+              <input type="url" id="url" name="url" required><br><br>
+              <input type="submit" value="Create Feed">
+          </form>
+
+      <h2>Feeds</h2>
+      <table border="1" cellpadding="5" cellspacing="0">
+          <thead>
+              <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>URL</th>
+                  <th>Created At</th>
+                  <th>Last Refresh</th>
+                  <th>Total feed count</th>
+                  <th>Edit</th>
+                </tr>
+          </thead>
+          <tbody>
+              {{range .Feeds}}
+              <tr>
+                  <td>{{.ID}}</td>
+                  <td>{{.Name}}</td>
+                  <td><a href="{{.Url}}" target="_blank">{{.Url}}</a></td>
+                  <td>{{.CreatedAt}}</td>
+                  <td>#todo</td>
+                  <td>#todo</td>
+                  <td><a href="/feed/{{.ID}}/edit">Edit</a></td>
+              </tr>
+              {{else}}
+              <tr>
+                  <td colspan="6">No feeds available</td>
+              </tr>
+              {{end}}
+          </tbody>
+      </table>
+
+    </main>
+
+    <footer>
+        <div>
+            <p>
+              <a href="https://github.com/alessandrocuzzocrea/www2rss" target="_blank" rel="noopener">
+                View on GitHub
+              </a>
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
+

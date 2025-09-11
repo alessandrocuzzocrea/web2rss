@@ -46,7 +46,7 @@ func (a *App) handleHomepage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	// Execute the template
-	if err := a.templates.ExecuteTemplate(w, "layout.html", data); err != nil {
+	if err := a.templates.ExecuteTemplate(w, "home.html", data); err != nil {
 		http.Error(w, fmt.Sprintf("Template error: %v", err), http.StatusInternalServerError)
 		return
 	}
