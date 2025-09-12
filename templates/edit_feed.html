@@ -30,30 +30,30 @@
                     Feed Name
                     <input type="text" id="name" name="name" value="{{.Name}}" required>
                 </label>
-                
+
                 <label for="url">
                     Website URL
                     <input type="url" id="url" name="url" value="{{.Url}}" required>
                 </label>
-                
+
                 <label for="item_selector">
                     Item Selector
                     <input type="text" id="item_selector" name="item_selector" value="{{.ItemSelector}}" required>
                     <small>CSS selector for each item/article on the page</small>
                 </label>
-                
+
                 <label for="title_selector">
                     Title Selector
                     <input type="text" id="title_selector" name="title_selector" value="{{.TitleSelector}}" required>
                     <small>CSS selector for the title within each item</small>
                 </label>
-                
+
                 <label for="link_selector">
                     Link Selector
                     <input type="text" id="link_selector" name="link_selector" value="{{.LinkSelector}}" required>
                     <small>CSS selector for the link within each item</small>
                 </label>
-                
+
                 <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                     <button type="submit">Update Feed</button>
                     <a href="/" role="button" class="secondary">Cancel</a>
