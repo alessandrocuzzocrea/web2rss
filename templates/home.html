@@ -5,6 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="/css/vendor/pico.min.css">
+    <style>
+        /* Responsive table improvements */
+        table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        /* Column widths to prevent overflow */
+        th:nth-child(1), td:nth-child(1) { width: 40%; } /* Feed info */
+        th:nth-child(2), td:nth-child(2) { width: 15%; } /* Created */
+        th:nth-child(3), td:nth-child(3) { width: 15%; } /* Last Refresh */
+        th:nth-child(4), td:nth-child(4) { width: 10%; } /* Items */
+        th:nth-child(5), td:nth-child(5) { width: 20%; } /* Actions */
+
+        /* Ensure text wraps and doesn't overflow */
+        td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Make URLs break nicely */
+        td a {
+            word-break: break-all;
+        }
+
+        /* Responsive actions */
+        @media (max-width: 768px) {
+            th:nth-child(2), td:nth-child(2),
+            th:nth-child(3), td:nth-child(3) {
+                display: none;
+            }
+            th:nth-child(1), td:nth-child(1) { width: 60%; }
+            th:nth-child(4), td:nth-child(4) { width: 15%; }
+            th:nth-child(5), td:nth-child(5) { width: 25%; }
+        }
+    </style>
     <title>{{.Title}} - web2rss</title>
     <meta name="description" content="Convert websites to RSS feeds">
 </head>
@@ -44,37 +80,36 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>URL</th>
-                            <th>Created At</th>
+                            <th>Feed</th>
+                            <th>Created</th>
                             <th>Last Refresh</th>
-                            <th>Total feed count</th>
-                            <th>RSS</th>
-                            <th>Refresh</th>
-                            <th>Edit</th>
+                            <th>Items</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {{range .Feeds}}
                         <tr>
-                            <td>{{.ID}}</td>
-                            <td>{{.Name}}</td>
-                            <td><a href="{{.Url}}" target="_blank">{{.Url}}</a></td>
-                            <td>{{.CreatedAt}}</td>
-                            <td>{{if .LastRefreshedAt.Valid}}{{.LastRefreshedAt.Time}}{{else}}Never{{end}}</td>
-                            <td>{{.ItemsCount}}</td>
-                            <td><a href="/feed/{{.ID}}/rss" target="_blank" role="button" class="outline">RSS</a></td>
                             <td>
-                                <form action="/feed/{{.ID}}/refresh" method="post" style="display:inline;">
-                                    <button type="submit" class="outline">Refresh</button>
-                                </form>
+                                <strong>{{.Name}}</strong><br>
+                                <small><a href="{{.Url}}" target="_blank">{{.Url}}</a></small>
                             </td>
-                            <td><a href="/feed/{{.ID}}/edit" role="button" class="outline">Edit</a></td>
+                            <td><small>{{.CreatedAt}}</small></td>
+                            <td><small>{{if .LastRefreshedAt.Valid}}{{.LastRefreshedAt.Time}}{{else}}Never{{end}}</small></td>
+                            <td>{{.ItemsCount}}</td>
+                            <td>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <a href="/feed/{{.ID}}/rss" target="_blank" role="button" class="outline" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">RSS</a>
+                                    <form action="/feed/{{.ID}}/refresh" method="post" style="display:inline;">
+                                        <button type="submit" class="outline" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">↻</button>
+                                    </form>
+                                    <a href="/feed/{{.ID}}/edit" role="button" class="outline" style="font-size: 0.8rem; padding: 0.25rem 0.5rem;">Edit</a>
+                                </div>
+                            </td>
                         </tr>
                         {{else}}
                         <tr>
-                            <td colspan="9">No feeds available</td>
+                            <td colspan="5">No feeds available</td>
                         </tr>
                         {{end}}
                     </tbody>
