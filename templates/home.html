@@ -52,7 +52,7 @@
                   <td>{{.Name}}</td>
                   <td><a href="{{.Url}}" target="_blank">{{.Url}}</a></td>
                   <td>{{.CreatedAt}}</td>
-                  <td>#todo</td>
+                  <td>{{if .LastRefreshedAt.Valid}}{{.LastRefreshedAt.Time}}{{else}}Never{{end}}</td>
                   <td>{{.ItemsCount}}</td>
                   <td><a href="/feed/{{.ID}}/rss" target="_blank">RSS</a></td>
                     <td>

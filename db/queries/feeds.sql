@@ -23,6 +23,11 @@ UPDATE feeds
 SET name = ?, url = ?, item_selector = ?, title_selector = ?, link_selector = ?, description_selector = ?, updated_at = CURRENT_TIMESTAMP
 WHERE id = ?;
 
+-- name: UpdateFeedLastRefreshedAt :exec
+UPDATE feeds
+SET last_refreshed_at = ?, updated_at = CURRENT_TIMESTAMP
+WHERE id = ?;
+
 -- name: DeleteFeed :exec
 DELETE FROM feeds
 WHERE id = ?;

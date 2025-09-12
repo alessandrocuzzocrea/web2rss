@@ -139,5 +139,14 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 	})
 
 	log.Printf("Feed %d: processed %d items. Upserted %d new items.", feed.ID, newItemsCount, len(count))
+
+	// Update the feed's last_refreshed_at timestamp
+	if err := a.queries.UpdateFeedLastRefreshedAt(ctx, db.UpdateFeedLastRefreshedAtParams{
+		ID:              feed.ID,
+		LastRefreshedAt: db.NewNullTime(time.Now()),
+	}); err != nil {
+		log.Printf("Failed to update last_refreshed_at for feed %d: %v", feed.ID, err)
+	}
+
 	return nil
 }
