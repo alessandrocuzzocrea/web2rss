@@ -20,7 +20,10 @@ func (a *App) Routes() *http.ServeMux {
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintf(w, `{"status": "healthy"}`)
+		_, err := fmt.Fprintf(w, `{"status": "healthy"}`)
+		if err != nil {
+			http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		}
 	})
 
 	// Feed endpoints

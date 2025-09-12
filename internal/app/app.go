@@ -14,6 +14,10 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+const (
+	dataDirPerm = 0755
+)
+
 // App represents the main application
 type App struct {
 	db        *sql.DB
@@ -25,7 +29,7 @@ type App struct {
 // New creates a new instance of the application
 func New() (*App, error) {
 	// Create data directory if it doesn't exist
-	if err := os.MkdirAll("./data", 0755); err != nil {
+	if err := os.MkdirAll("./data", dataDirPerm); err != nil {
 		return nil, fmt.Errorf("failed to create data directory: %w", err)
 	}
 
@@ -35,8 +39,8 @@ func New() (*App, error) {
 	}
 
 	// Optional: set pool settings
-	database.SetMaxOpenConns(10)
-	database.SetMaxIdleConns(5)
+	// database.SetMaxOpenConns(10)
+	// database.SetMaxIdleConns(5)
 
 	queries := db.New(database)
 
@@ -65,7 +69,7 @@ func (a *App) Run() error {
 	ctx := context.Background()
 
 	// Create data directory if it doesn't exist
-	if err := os.MkdirAll("./data", 0755); err != nil {
+	if err := os.MkdirAll("./data", dataDirPerm); err != nil {
 		return fmt.Errorf("failed to create data directory: %w", err)
 	}
 
@@ -74,7 +78,11 @@ func (a *App) Run() error {
 	if err != nil {
 		return fmt.Errorf("failed to open database: %w", err)
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Printf("failed to close db: %v", err)
+		}
+	}()
 
 	// Test database connection
 	if err := db.PingContext(ctx); err != nil {

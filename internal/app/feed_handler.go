@@ -94,7 +94,7 @@ func (a *App) handleEditFeed(w http.ResponseWriter, r *http.Request) {
 
 	// Execute the template
 	if err := a.templates.ExecuteTemplate(w, "edit_feed.html", data); err != nil {
-		//print the err
+		// print the err
 		fmt.Printf("Template error: %v\n", err)
 		http.Error(w, "Template error", http.StatusInternalServerError)
 		return
@@ -158,9 +158,9 @@ func nullStringToString(ns sql.NullString) string {
 	return ""
 }
 
-func stringToNullString(s string) sql.NullString {
-	if s == "" {
-		return sql.NullString{Valid: false}
-	}
-	return sql.NullString{String: s, Valid: true}
-}
+// func stringToNullString(s string) sql.NullString {
+// 	if s == "" {
+// 		return sql.NullString{Valid: false}
+// 	}
+// 	return sql.NullString{String: s, Valid: true}
+// }

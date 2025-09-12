@@ -318,7 +318,7 @@ func TestRSSXMLConformance(t *testing.T) {
 }
 
 // handleFeedRSSWithMocks is a test version of handleFeedRSS that accepts mock queries
-func handleFeedRSSWithMocks(a *App, w http.ResponseWriter, r *http.Request, queries *mockQueries) {
+func handleFeedRSSWithMocks(_ *App, w http.ResponseWriter, r *http.Request, queries *mockQueries) {
 	ctx := r.Context()
 
 	idStr := r.PathValue("id")
@@ -373,7 +373,11 @@ func handleFeedRSSWithMocks(a *App, w http.ResponseWriter, r *http.Request, quer
 	w.WriteHeader(http.StatusOK)
 
 	// Write XML declaration
-	w.Write([]byte(xml.Header))
+	_, err = w.Write([]byte(xml.Header))
+	if err != nil {
+		http.Error(w, "Failed to write XML header", http.StatusInternalServerError)
+		return
+	}
 
 	// Encode RSS to XML
 	encoder := xml.NewEncoder(w)

@@ -1,44 +1,13 @@
+version: "2"
+
 run:
   timeout: 5m
   issues-exit-code: 1
   tests: true
 
-linters-settings:
-  govet:
-    enable:
-      - shadow
-  gocyclo:
-    min-complexity: 15
-  dupl:
-    threshold: 100
-  goconst:
-    min-len: 2
-    min-occurrences: 2
-  misspell:
-    locale: US
-  lll:
-    line-length: 140
-  goimports:
-    local-prefixes: github.com/alessandrocuzzocrea/web2rss
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
-    disabled-checks:
-      - dupImport
-      - ifElseChain
-      - octalLiteral
-      - whyNoLint
-
 linters:
-  disable-all: true
   enable:
     - bodyclose
-    # - depguard
-    - dogsled
     - dupl
     - errcheck
     - copyloopvar
@@ -47,42 +16,20 @@ linters:
     - goconst
     - gocritic
     - gocyclo
-    - gofmt
-    - goimports
     - mnd
     - goprintffuncname
-    # - gosec
-    - gosimple
     - govet
     - ineffassign
     - lll
     - misspell
     - nolintlint
-    - rowserrcheck
     - staticcheck
-    - stylecheck
-    - typecheck
     - unconvert
     - unparam
     - unused
     - whitespace
 
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - mnd
-        - goconst
-        - gocyclo
-        - errcheck
-        - dupl
-        # - gosec
-    - path: tutorial/query\.sql\.go
-      linters:
-        - all
-    - path: tutorial/db\.go
-      linters:
-        - all
-    - path: tutorial/models\.go
-      linters:
-        - all
+formatters:
+  enable:
+    - gofmt
+    - goimports

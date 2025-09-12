@@ -88,7 +88,12 @@ func (a *App) handleFeedRSS(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	// Write XML declaration
-	w.Write([]byte(xml.Header))
+	_, err = w.Write([]byte(xml.Header))
+	if err != nil {
+		fmt.Printf("Failed to write XML header: %v\n", err)
+		http.Error(w, "Failed to write XML header", http.StatusInternalServerError)
+		return
+	}
 
 	// Encode RSS to XML
 	encoder := xml.NewEncoder(w)
