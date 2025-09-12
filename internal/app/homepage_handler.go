@@ -16,7 +16,7 @@ type HomePageData struct {
 	GoVersion string
 	BuildTime string
 	Uptime    string
-	Feeds     []db.Feed
+	Feeds     []db.ListFeedsWithItemsCountRow
 }
 
 // handleHomepage renders the homepage using HTML templates
@@ -27,7 +27,7 @@ func (a *App) handleHomepage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	feeds, err := a.queries.ListFeeds(r.Context())
+	feeds, err := a.queries.ListFeedsWithItemsCount(r.Context())
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to list feeds: %v", err), http.StatusInternalServerError)
 		return

@@ -119,8 +119,63 @@ func (q *Queries) ListFeeds(ctx context.Context) ([]Feed, error) {
 	return items, nil
 }
 
+const listFeedsWithItemsCount = `-- name: ListFeedsWithItemsCount :many
+SELECT f.id, f.name, f.url, f.item_selector, f.title_selector, f.link_selector, f.description_selector, f.created_at, f.updated_at, COUNT(i.id) AS items_count
+FROM feeds f
+LEFT JOIN feed_items i ON f.id = i.feed_id
+GROUP BY f.id
+ORDER BY f.name
+`
+
+type ListFeedsWithItemsCountRow struct {
+	ID                  int64          `json:"id"`
+	Name                string         `json:"name"`
+	Url                 string         `json:"url"`
+	ItemSelector        sql.NullString `json:"item_selector"`
+	TitleSelector       sql.NullString `json:"title_selector"`
+	LinkSelector        sql.NullString `json:"link_selector"`
+	DescriptionSelector sql.NullString `json:"description_selector"`
+	CreatedAt           sql.NullTime   `json:"created_at"`
+	UpdatedAt           sql.NullTime   `json:"updated_at"`
+	ItemsCount          int64          `json:"items_count"`
+}
+
+func (q *Queries) ListFeedsWithItemsCount(ctx context.Context) ([]ListFeedsWithItemsCountRow, error) {
+	rows, err := q.db.QueryContext(ctx, listFeedsWithItemsCount)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListFeedsWithItemsCountRow
+	for rows.Next() {
+		var i ListFeedsWithItemsCountRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Url,
+			&i.ItemSelector,
+			&i.TitleSelector,
+			&i.LinkSelector,
+			&i.DescriptionSelector,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ItemsCount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateFeed = `-- name: UpdateFeed :exec
-UPDATE feeds 
+UPDATE feeds
 SET name = ?, url = ?, item_selector = ?, title_selector = ?, link_selector = ?, description_selector = ?, updated_at = CURRENT_TIMESTAMP
 WHERE id = ?
 `
