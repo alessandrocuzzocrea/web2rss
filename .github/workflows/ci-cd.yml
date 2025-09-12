@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: main-pipeline
+  cancel-in-progress: true   # optional: cancel previous runs if a new one starts
+
 env:
   GO_VERSION: '1.25'
   REGISTRY: ghcr.io
