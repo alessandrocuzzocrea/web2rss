@@ -3,48 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="/css/vendor/pico.min.css">
     <title>{{.Name}} - web2rss</title>
     <meta name="description" content="Convert websites to RSS feeds">
 </head>
 <body>
-    <header>
-        <div>
-            <a href="/">🌐 web2rss</a>
-            <nav>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/feeds">Feeds</a></li>
-                    <li><a href="/health">Health</a></li>
-                </ul>
-            </nav>
-        </div>
+    <header class="container">
+        <nav>
+            <ul>
+                <li><strong>🌐 web2rss</strong></li>
+            </ul>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/feeds">Feeds</a></li>
+                <li><a href="/health">Health</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <main>
-<h2>Edit Feed</h2>
-<form action="/feed/{{.ID}}/edit" method="post">
-    <label for="name">Feed Name:</label><br>
-    <input type="text" id="name" name="name" value="{{.Name}}" required><br><br>
-    <label for="url">Website URL:</label><br>
-    <input type="url" id="url" name="url" value="{{.Url}}" required><br><br>
-    <label for="item_selector">Item Selector:</label><br>
-    <input type="text" id="item_selector" name="item_selector" value="{{.ItemSelector}}" required><br><br>
-    <label for="title_selector">Title Selector:</label><br>
-    <input type="text" id="title_selector" name="title_selector" value="{{.TitleSelector}}" required><br><br>
-    <label for="link_selector">Link Selector:</label><br>
-    <input type="text" id="link_selector" name="link_selector" value="{{.LinkSelector}}" required><br><br>
-    <input type="submit" value="Update Feed">
-</form>
+    <main class="container">
+        <section>
+            <h2>Edit Feed</h2>
+            <form action="/feed/{{.ID}}/edit" method="post">
+                <label for="name">
+                    Feed Name
+                    <input type="text" id="name" name="name" value="{{.Name}}" required>
+                </label>
+                
+                <label for="url">
+                    Website URL
+                    <input type="url" id="url" name="url" value="{{.Url}}" required>
+                </label>
+                
+                <label for="item_selector">
+                    Item Selector
+                    <input type="text" id="item_selector" name="item_selector" value="{{.ItemSelector}}" required>
+                    <small>CSS selector for each item/article on the page</small>
+                </label>
+                
+                <label for="title_selector">
+                    Title Selector
+                    <input type="text" id="title_selector" name="title_selector" value="{{.TitleSelector}}" required>
+                    <small>CSS selector for the title within each item</small>
+                </label>
+                
+                <label for="link_selector">
+                    Link Selector
+                    <input type="text" id="link_selector" name="link_selector" value="{{.LinkSelector}}" required>
+                    <small>CSS selector for the link within each item</small>
+                </label>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="submit">Update Feed</button>
+                    <a href="/" role="button" class="secondary">Cancel</a>
+                </div>
+            </form>
+        </section>
  </main>
 
-    <footer>
-        <div>
-            <p>
-              <a href="https://github.com/alessandrocuzzocrea/web2rss" target="_blank" rel="noopener">
+    <footer class="container">
+        <p>
+            <a href="https://github.com/alessandrocuzzocrea/web2rss" target="_blank" rel="noopener">
                 View on GitHub
-              </a>
-            </p>
-        </div>
+            </a>
+        </p>
     </footer>
 </body>
 </html>
