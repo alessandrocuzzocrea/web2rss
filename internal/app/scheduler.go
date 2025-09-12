@@ -56,16 +56,15 @@ func (a *App) refreshAllFeeds() {
 
 // refreshFeed fetches and updates a single feed
 func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
-
-	if feed.ItemSelector.Valid == false {
+	if !feed.ItemSelector.Valid {
 		return fmt.Errorf("feed %d is missing item selector", feed.ID)
 	}
 
-	if feed.TitleSelector.Valid == false {
+	if !feed.TitleSelector.Valid {
 		return fmt.Errorf("feed %d is missing title selector", feed.ID)
 	}
 
-	if feed.LinkSelector.Valid == false {
+	if !feed.LinkSelector.Valid {
 		return fmt.Errorf("feed %d is missing link selector", feed.ID)
 	}
 
@@ -74,7 +73,11 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 	if err != nil {
 		return fmt.Errorf("failed to fetch URL: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("failed to close response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("HTTP error: %d", resp.StatusCode)
