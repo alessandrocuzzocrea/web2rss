@@ -9,6 +9,23 @@ import (
 	"github.com/alessandrocuzzocrea/web2rss/internal/db"
 )
 
+func (a *App) handleNewFeed(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	// Execute the template
+	if err := a.templates.ExecuteTemplate(w, "new_feed.html", nil); err != nil {
+		// print the err
+		fmt.Printf("Template error: %v\n", err)
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
