@@ -30,3 +30,8 @@ linters:
     - unparam
     - unused
     - whitespace
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
