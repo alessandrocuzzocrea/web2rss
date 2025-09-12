@@ -1,5 +1,5 @@
 services:
-  www2rss:
+  web2rss:
     build:
       context: .
       dockerfile: Dockerfile

@@ -4,7 +4,7 @@ sql:
     queries: db/queries
     schema: db/migrations
     database:
-      uri: sqlite://data/www2rss.sqlite3
+      uri: sqlite://data/web2rss.sqlite3
     gen:
       go:
         package: db

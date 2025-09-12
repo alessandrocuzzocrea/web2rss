@@ -1,4 +1,4 @@
-module github.com/alessandrocuzzocrea/www2rss
+module github.com/alessandrocuzzocrea/web2rss
 
 go 1.24
 

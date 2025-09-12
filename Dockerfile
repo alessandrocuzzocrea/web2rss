@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the application (static binary)
-RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o www2rss ./cmd/www2rss
+RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o web2rss ./cmd/web2rss
 
 # Install golang-migrate CLI
 RUN go install -tags "sqlite3" github.com/golang-migrate/migrate/v4/cmd/migrate@latest
@@ -28,7 +28,7 @@ RUN apk add --no-cache ca-certificates sqlite curl
 WORKDIR /root/
 
 # Copy app binary from builder
-COPY --from=builder /app/www2rss .
+COPY --from=builder /app/web2rss .
 
 # Copy migrate binary from builder
 COPY --from=builder /go/bin/migrate /usr/local/bin/migrate

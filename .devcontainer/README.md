@@ -1,4 +1,4 @@
-# www2rss Development with GitHub Codespaces
+# web2rss Development with GitHub Codespaces
 
 This project is configured to work seamlessly with GitHub Codespaces using a devcontainer.
 
@@ -47,9 +47,9 @@ The devcontainer includes:
 ## 📁 Project Structure
 
 ```
-www2rss/
+web2rss/
 ├── .devcontainer/          # Devcontainer configuration
-├── cmd/www2rss/           # Application entry point
+├── cmd/web2rss/           # Application entry point
 ├── internal/              # Internal packages
 │   ├── app/              # Application logic
 │   └── db/               # Database models and queries
@@ -69,7 +69,7 @@ The development server uses Air for hot reloading:
 - Uses SQLite for simplicity
 - Migrations in `db/migrations/`
 - SQLC generates type-safe Go code from SQL
-- Database file stored in `data/www2rss.sqlite3`
+- Database file stored in `data/web2rss.sqlite3`
 
 ## 🛠️ Troubleshooting
 

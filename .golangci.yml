@@ -19,7 +19,7 @@ linters-settings:
   lll:
     line-length: 140
   goimports:
-    local-prefixes: github.com/alessandrocuzzocrea/www2rss
+    local-prefixes: github.com/alessandrocuzzocrea/web2rss
   gocritic:
     enabled-tags:
       - diagnostic

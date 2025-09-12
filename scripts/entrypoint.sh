@@ -2,10 +2,10 @@
 
 set -e
 
-echo "Starting www2rss..."
+echo "Starting web2rss..."
 
 # Database path
-DB_PATH="/root/data/www2rss.sqlite3"
+DB_PATH="/root/data/web2rss.sqlite3"
 MIGRATIONS_PATH="/root/db/migrations"
 
 # Create data directory
@@ -24,5 +24,5 @@ else
 fi
 
 # Start the application
-echo "🚀 Starting www2rss application..."
-exec ./www2rss
+echo "🚀 Starting web2rss application..."
+exec ./web2rss

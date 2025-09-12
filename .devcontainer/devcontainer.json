@@ -1,7 +1,7 @@
 {
-  "name": "www2rss Go Development",
+  "name": "web2rss Go Development",
   "image": "mcr.microsoft.com/devcontainers/go:1-1.24-bookworm",
-  
+
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
@@ -42,11 +42,11 @@
   "forwardPorts": [8080],
   "portsAttributes": {
     "8080": {
-      "label": "www2rss server",
+      "label": "web2rss server",
       "onAutoForward": "notify"
     }
   },
 
   "remoteUser": "vscode",
-  "workspaceFolder": "/workspaces/www2rss"
+  "workspaceFolder": "/workspaces/web2rss"
 }

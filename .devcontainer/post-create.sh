@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Setting up www2rss development environment..."
+echo "🚀 Setting up web2rss development environment..."
 
 # Update package list
 sudo apt-get update
@@ -33,7 +33,7 @@ go mod download
 # Run database migrations if they exist
 if [ -d "./db/migrations" ]; then
     echo "🗃️ Setting up database..."
-    migrate -database "sqlite://data/www2rss.sqlite3" -path db/migrations up || echo "⚠️ Migration failed or no migrations to run"
+    migrate -database "sqlite://data/web2rss.sqlite3" -path db/migrations up || echo "⚠️ Migration failed or no migrations to run"
 fi
 
 # Generate SQLC code

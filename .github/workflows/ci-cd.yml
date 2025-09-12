@@ -96,13 +96,13 @@ jobs:
 
     - name: Build application
       run: |
-        CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o www2rss ./cmd/www2rss
+        CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o web2rss ./cmd/web2rss
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: www2rss-binary
-        path: www2rss
+        name: web2rss-binary
+        path: web2rss
 
   security:
     name: Security Scan

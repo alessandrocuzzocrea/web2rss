@@ -21,7 +21,7 @@ README.md
 Thumbs.db
 
 # Build artifacts
-www2rss
+web2rss
 *.exe
 
 # Test artifacts
