@@ -19,6 +19,7 @@ type Feed struct {
 	CreatedAt           sql.NullTime   `json:"created_at"`
 	UpdatedAt           sql.NullTime   `json:"updated_at"`
 	LastRefreshedAt     sql.NullTime   `json:"last_refreshed_at"`
+	DateSelector        sql.NullString `json:"date_selector"`
 }
 
 type FeedItem struct {
@@ -29,4 +30,5 @@ type FeedItem struct {
 	Link        string         `json:"link"`
 	CreatedAt   sql.NullTime   `json:"created_at"`
 	UpdatedAt   sql.NullTime   `json:"updated_at"`
+	Date        sql.NullTime   `json:"date"`
 }

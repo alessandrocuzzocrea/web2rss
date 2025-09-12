@@ -36,7 +36,7 @@ func (q *Queries) DeleteOldFeedItems(ctx context.Context, arg DeleteOldFeedItems
 }
 
 const getFeedItem = `-- name: GetFeedItem :one
-SELECT id, feed_id, title, description, link, created_at, updated_at FROM feed_items
+SELECT id, feed_id, title, description, link, created_at, updated_at, date FROM feed_items
 WHERE id = ? LIMIT 1
 `
 
@@ -51,12 +51,13 @@ func (q *Queries) GetFeedItem(ctx context.Context, id int64) (FeedItem, error) {
 		&i.Link,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Date,
 	)
 	return i, err
 }
 
 const listFeedItems = `-- name: ListFeedItems :many
-SELECT id, feed_id, title, description, link, created_at, updated_at FROM feed_items
+SELECT id, feed_id, title, description, link, created_at, updated_at, date FROM feed_items
 WHERE feed_id = ?
 ORDER BY created_at DESC
 `
@@ -78,6 +79,7 @@ func (q *Queries) ListFeedItems(ctx context.Context, feedID int64) ([]FeedItem, 
 			&i.Link,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Date,
 		); err != nil {
 			return nil, err
 		}

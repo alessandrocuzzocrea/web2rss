@@ -13,7 +13,7 @@ import (
 const createFeed = `-- name: CreateFeed :one
 INSERT INTO feeds (name, url, item_selector, title_selector, link_selector, description_selector)
 VALUES (?, ?, ?, ?, ?, ?)
-RETURNING id, name, url, item_selector, title_selector, link_selector, description_selector, created_at, updated_at, last_refreshed_at
+RETURNING id, name, url, item_selector, title_selector, link_selector, description_selector, created_at, updated_at, last_refreshed_at, date_selector
 `
 
 type CreateFeedParams struct {
@@ -46,6 +46,7 @@ func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (Feed, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.LastRefreshedAt,
+		&i.DateSelector,
 	)
 	return i, err
 }
@@ -61,7 +62,7 @@ func (q *Queries) DeleteFeed(ctx context.Context, id int64) error {
 }
 
 const getFeed = `-- name: GetFeed :one
-SELECT id, name, url, item_selector, title_selector, link_selector, description_selector, created_at, updated_at, last_refreshed_at FROM feeds
+SELECT id, name, url, item_selector, title_selector, link_selector, description_selector, created_at, updated_at, last_refreshed_at, date_selector FROM feeds
 WHERE id = ? LIMIT 1
 `
 
@@ -79,12 +80,13 @@ func (q *Queries) GetFeed(ctx context.Context, id int64) (Feed, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.LastRefreshedAt,
+		&i.DateSelector,
 	)
 	return i, err
 }
 
 const listFeeds = `-- name: ListFeeds :many
-SELECT id, name, url, item_selector, title_selector, link_selector, description_selector, created_at, updated_at, last_refreshed_at FROM feeds
+SELECT id, name, url, item_selector, title_selector, link_selector, description_selector, created_at, updated_at, last_refreshed_at, date_selector FROM feeds
 ORDER BY name
 `
 
@@ -108,6 +110,7 @@ func (q *Queries) ListFeeds(ctx context.Context) ([]Feed, error) {
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.LastRefreshedAt,
+			&i.DateSelector,
 		); err != nil {
 			return nil, err
 		}
@@ -123,7 +126,7 @@ func (q *Queries) ListFeeds(ctx context.Context) ([]Feed, error) {
 }
 
 const listFeedsWithItemsCount = `-- name: ListFeedsWithItemsCount :many
-SELECT f.id, f.name, f.url, f.item_selector, f.title_selector, f.link_selector, f.description_selector, f.created_at, f.updated_at, f.last_refreshed_at, COUNT(i.id) AS items_count
+SELECT f.id, f.name, f.url, f.item_selector, f.title_selector, f.link_selector, f.description_selector, f.created_at, f.updated_at, f.last_refreshed_at, f.date_selector, COUNT(i.id) AS items_count
 FROM feeds f
 LEFT JOIN feed_items i ON f.id = i.feed_id
 GROUP BY f.id
@@ -141,6 +144,7 @@ type ListFeedsWithItemsCountRow struct {
 	CreatedAt           sql.NullTime   `json:"created_at"`
 	UpdatedAt           sql.NullTime   `json:"updated_at"`
 	LastRefreshedAt     sql.NullTime   `json:"last_refreshed_at"`
+	DateSelector        sql.NullString `json:"date_selector"`
 	ItemsCount          int64          `json:"items_count"`
 }
 
@@ -164,6 +168,7 @@ func (q *Queries) ListFeedsWithItemsCount(ctx context.Context) ([]ListFeedsWithI
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.LastRefreshedAt,
+			&i.DateSelector,
 			&i.ItemsCount,
 		); err != nil {
 			return nil, err
