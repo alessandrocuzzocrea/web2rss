@@ -59,7 +59,7 @@ func (q *Queries) GetFeedItem(ctx context.Context, id int64) (FeedItem, error) {
 const listFeedItems = `-- name: ListFeedItems :many
 SELECT id, feed_id, title, description, link, created_at, updated_at, date FROM feed_items
 WHERE feed_id = ?
-ORDER BY created_at DESC
+ORDER BY COALESCE(date, created_at) DESC
 `
 
 func (q *Queries) ListFeedItems(ctx context.Context, feedID int64) ([]FeedItem, error) {

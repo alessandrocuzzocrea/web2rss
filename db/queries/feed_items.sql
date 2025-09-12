@@ -5,7 +5,7 @@ WHERE id = ? LIMIT 1;
 -- name: ListFeedItems :many
 SELECT * FROM feed_items
 WHERE feed_id = ?
-ORDER BY created_at DESC;
+ORDER BY COALESCE(date, created_at) DESC;
 
 -- name: UpsertFeedItem :many
 INSERT INTO feed_items (feed_id, title, description, link, date, updated_at)
