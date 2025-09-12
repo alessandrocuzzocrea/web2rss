@@ -15,6 +15,7 @@ func (a *App) Routes() *http.ServeMux {
 	mux.HandleFunc("POST /feed/", a.handleCreateFeed)
 	mux.HandleFunc("GET /feed/{id}/edit", a.handleEditFeed)
 	mux.HandleFunc("POST /feed/{id}/edit", a.handleUpdateFeed)
+	mux.HandleFunc("POST /feed/{id}/refresh", a.handleRefreshFeed)
 
 	// Add a health endpoint
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

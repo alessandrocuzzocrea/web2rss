@@ -41,6 +41,7 @@
                   <th>Last Refresh</th>
                   <th>Total feed count</th>
                   <th>RSS</th>
+                  <th>Refresh</th>
                   <th>Edit</th>
                 </tr>
           </thead>
@@ -54,6 +55,11 @@
                   <td>#todo</td>
                   <td>{{.ItemsCount}}</td>
                   <td><a href="/feed/{{.ID}}/rss" target="_blank">RSS</a></td>
+                    <td>
+                    <form action="/feed/{{.ID}}/refresh" method="post" style="display:inline;">
+                      <button type="submit">Refresh</button>
+                    </form>
+                    </td>
                   <td><a href="/feed/{{.ID}}/edit">Edit</a></td>
               </tr>
               {{else}}

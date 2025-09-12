@@ -151,6 +151,37 @@ func (a *App) handleUpdateFeed(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+func (a *App) handleRefreshFeed(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	idStr := r.PathValue("id")
+
+	feedID, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid feed ID", http.StatusBadRequest)
+		return
+	}
+
+	feed, err := a.queries.GetFeed(r.Context(), feedID)
+	if err != nil {
+		http.Error(w, "Feed not found", http.StatusNotFound)
+		return
+	}
+
+	// Trigger feed refresh (this could be a background job in a real application)
+	err = a.refreshFeed(r.Context(), feed)
+	if err != nil {
+		http.Error(w, "Failed to refresh feed", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect back to the homepage after successful refresh
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func nullStringToString(ns sql.NullString) string {
 	if ns.Valid {
 		return ns.String
