@@ -1,1 +1,1 @@
-ALTER TABLE feeds DROP COLUMN last_refresh;
+ALTER TABLE feeds DROP COLUMN last_refreshed_at;
