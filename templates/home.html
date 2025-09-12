@@ -3,83 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="/css/vendor/pico.min.css">
     <title>{{.Title}} - web2rss</title>
     <meta name="description" content="Convert websites to RSS feeds">
 </head>
 <body>
-    <header>
-        <div>
-            <a href="/">🌐 web2rss</a>
-            <nav>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/feeds">Feeds</a></li>
-                    <li><a href="/health">Health</a></li>
-                </ul>
-            </nav>
-        </div>
+    <header class="container">
+        <nav>
+            <ul>
+                <li><strong>🌐 web2rss</strong></li>
+            </ul>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/feeds">Feeds</a></li>
+                <li><a href="/health">Health</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <main>
-        <h2> Add new feed</h2>
-          <form action="/feed/" method="post">
-              <label for="name">Feed Name:</label><br>
-              <input type="text" id="name" name="name" required><br><br>
-              <label for="url">Website URL:</label><br>
-              <input type="url" id="url" name="url" required><br><br>
-              <input type="submit" value="Create Feed">
-          </form>
+    <main class="container">
+        <section>
+            <h2>Add new feed</h2>
+            <form action="/feed/" method="post">
+                <label for="name">
+                    Feed Name
+                    <input type="text" id="name" name="name" required>
+                </label>
+                <label for="url">
+                    Website URL
+                    <input type="url" id="url" name="url" required>
+                </label>
+                <button type="submit">Create Feed</button>
+            </form>
+        </section>
 
-      <h2>Feeds</h2>
-      <table border="1" cellpadding="5" cellspacing="0">
-          <thead>
-              <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>URL</th>
-                  <th>Created At</th>
-                  <th>Last Refresh</th>
-                  <th>Total feed count</th>
-                  <th>RSS</th>
-                  <th>Refresh</th>
-                  <th>Edit</th>
-                </tr>
-          </thead>
-          <tbody>
-              {{range .Feeds}}
-              <tr>
-                  <td>{{.ID}}</td>
-                  <td>{{.Name}}</td>
-                  <td><a href="{{.Url}}" target="_blank">{{.Url}}</a></td>
-                  <td>{{.CreatedAt}}</td>
-                  <td>{{if .LastRefreshedAt.Valid}}{{.LastRefreshedAt.Time}}{{else}}Never{{end}}</td>
-                  <td>{{.ItemsCount}}</td>
-                  <td><a href="/feed/{{.ID}}/rss" target="_blank">RSS</a></td>
-                    <td>
-                    <form action="/feed/{{.ID}}/refresh" method="post" style="display:inline;">
-                      <button type="submit">Refresh</button>
-                    </form>
-                    </td>
-                  <td><a href="/feed/{{.ID}}/edit">Edit</a></td>
-              </tr>
-              {{else}}
-              <tr>
-                  <td colspan="7">No feeds available</td>
-              </tr>
-              {{end}}
-          </tbody>
-      </table>
+        <section>
+            <h2>Feeds</h2>
+            <figure>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>URL</th>
+                            <th>Created At</th>
+                            <th>Last Refresh</th>
+                            <th>Total feed count</th>
+                            <th>RSS</th>
+                            <th>Refresh</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .Feeds}}
+                        <tr>
+                            <td>{{.ID}}</td>
+                            <td>{{.Name}}</td>
+                            <td><a href="{{.Url}}" target="_blank">{{.Url}}</a></td>
+                            <td>{{.CreatedAt}}</td>
+                            <td>{{if .LastRefreshedAt.Valid}}{{.LastRefreshedAt.Time}}{{else}}Never{{end}}</td>
+                            <td>{{.ItemsCount}}</td>
+                            <td><a href="/feed/{{.ID}}/rss" target="_blank" role="button" class="outline">RSS</a></td>
+                            <td>
+                                <form action="/feed/{{.ID}}/refresh" method="post" style="display:inline;">
+                                    <button type="submit" class="outline">Refresh</button>
+                                </form>
+                            </td>
+                            <td><a href="/feed/{{.ID}}/edit" role="button" class="outline">Edit</a></td>
+                        </tr>
+                        {{else}}
+                        <tr>
+                            <td colspan="9">No feeds available</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </figure>
+        </section>
 
     </main>
 
-    <footer>
-        <div>
-            <p>
-              <a href="https://github.com/alessandrocuzzocrea/web2rss" target="_blank" rel="noopener">
+    <footer class="container">
+        <p>
+            <a href="https://github.com/alessandrocuzzocrea/web2rss" target="_blank" rel="noopener">
                 View on GitHub
-              </a>
-            </p>
-        </div>
+            </a>
+        </p>
     </footer>
 </body>
 </html>

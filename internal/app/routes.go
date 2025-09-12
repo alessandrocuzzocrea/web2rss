@@ -9,6 +9,12 @@ import (
 func (a *App) Routes() *http.ServeMux {
 	mux := http.NewServeMux()
 
+	// Serve static files (CSS, JS, images, etc.)
+	fs := http.FileServer(http.Dir("static/"))
+	mux.Handle("/css/", http.StripPrefix("/", fs))
+	mux.Handle("/js/", http.StripPrefix("/", fs))
+	mux.Handle("/images/", http.StripPrefix("/", fs))
+
 	// Homepage with HTML template
 	mux.HandleFunc("/", a.handleHomepage)
 
