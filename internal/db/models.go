@@ -18,6 +18,7 @@ type Feed struct {
 	DescriptionSelector sql.NullString `json:"description_selector"`
 	CreatedAt           sql.NullTime   `json:"created_at"`
 	UpdatedAt           sql.NullTime   `json:"updated_at"`
+	LastRefresh         sql.NullTime   `json:"last_refresh"`
 }
 
 type FeedItem struct {
