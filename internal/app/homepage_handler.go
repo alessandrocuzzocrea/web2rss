@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/alessandrocuzzocrea/www2rss/internal/db"
+	"github.com/alessandrocuzzocrea/web2rss/internal/db"
 )
 
 // HomePageData contains data for the homepage template

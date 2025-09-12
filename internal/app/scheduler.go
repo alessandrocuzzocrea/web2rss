@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/alessandrocuzzocrea/www2rss/internal/db"
+	"github.com/alessandrocuzzocrea/web2rss/internal/db"
 )
 
 // StartFeedScheduler starts a background goroutine that refreshes all feeds every hour

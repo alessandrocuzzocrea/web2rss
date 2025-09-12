@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/alessandrocuzzocrea/www2rss/internal/db"
+	"github.com/alessandrocuzzocrea/web2rss/internal/db"
 )
 
 func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {

@@ -10,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/alessandrocuzzocrea/www2rss/internal/db"
+	"github.com/alessandrocuzzocrea/web2rss/internal/db"
 	_ "modernc.org/sqlite"
 )
 
@@ -29,7 +29,7 @@ func New() (*App, error) {
 		return nil, fmt.Errorf("failed to create data directory: %w", err)
 	}
 
-	database, err := sql.Open("sqlite", "./data/www2rss.sqlite3")
+	database, err := sql.Open("sqlite", "./data/web2rss.sqlite3")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
@@ -70,7 +70,7 @@ func (a *App) Run() error {
 	}
 
 	// Open database connection
-	db, err := sql.Open("sqlite", "./data/www2rss.sqlite3")
+	db, err := sql.Open("sqlite", "./data/web2rss.sqlite3")
 	if err != nil {
 		return fmt.Errorf("failed to open database: %w", err)
 	}

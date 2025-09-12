@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alessandrocuzzocrea/www2rss/internal/db"
+	"github.com/alessandrocuzzocrea/web2rss/internal/db"
 	"github.com/stretchr/testify/assert"
 )
 
