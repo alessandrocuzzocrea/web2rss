@@ -95,8 +95,8 @@ func (q *Queries) ListFeedItems(ctx context.Context, feedID int64) ([]FeedItem, 
 }
 
 const upsertFeedItem = `-- name: UpsertFeedItem :many
-INSERT INTO feed_items (feed_id, title, description, link, updated_at)
-VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+INSERT INTO feed_items (feed_id, title, description, link, date, updated_at)
+VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 ON CONFLICT(feed_id, link) DO NOTHING
 RETURNING id
 `
@@ -106,6 +106,7 @@ type UpsertFeedItemParams struct {
 	Title       string         `json:"title"`
 	Description sql.NullString `json:"description"`
 	Link        string         `json:"link"`
+	Date        sql.NullTime   `json:"date"`
 }
 
 func (q *Queries) UpsertFeedItem(ctx context.Context, arg UpsertFeedItemParams) ([]int64, error) {
@@ -114,6 +115,7 @@ func (q *Queries) UpsertFeedItem(ctx context.Context, arg UpsertFeedItemParams) 
 		arg.Title,
 		arg.Description,
 		arg.Link,
+		arg.Date,
 	)
 	if err != nil {
 		return nil, err

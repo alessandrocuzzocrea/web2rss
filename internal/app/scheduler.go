@@ -112,6 +112,39 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 			}
 		}
 
+		var date time.Time
+		if feed.DateSelector.Valid && feed.DateSelector.String != "" {
+			// Extract the date string from the HTML
+			dateStr := strings.TrimSpace(s.Find(feed.DateSelector.String).Text())
+			fmt.Println("dateStr:", dateStr)
+
+			// Strip weekday in parentheses if present, e.g., "2025-08-09 (土)" → "2025-08-09"
+			if idx := strings.Index(dateStr, " "); idx != -1 {
+				dateStr = dateStr[:idx]
+			}
+
+			var err error
+			// Try common formats
+			layouts := []string{
+				"2006-01-02", // YYYY-MM-DD
+				"2006/01/02", // YYYY/MM/DD
+				"02-01-2006", // DD-MM-YYYY
+				time.RFC1123, // Mon, 02 Jan 2006 15:04:05 MST
+				time.RFC3339, // 2006-01-02T15:04:05Z07:00
+			}
+
+			for _, layout := range layouts {
+				date, err = time.Parse(layout, dateStr)
+				if err == nil {
+					break
+				}
+			}
+
+			if err != nil {
+				log.Printf("Failed to parse date '%s': %v", dateStr, err)
+			}
+		}
+
 		// Skip empty items
 		// if title == "" || link == "" {
 		// 	return
@@ -129,6 +162,7 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 			Title:       title,
 			Description: db.NewNullString(description),
 			Link:        link,
+			Date:        db.NewNullTime(date),
 		})
 
 		if err != nil {
