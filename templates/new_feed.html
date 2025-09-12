@@ -37,6 +37,33 @@
                     <input type="url" id="url" name="url" required>
                 </label>
 
+                <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;title&gt;Dummy Page&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    h1 { color: darkblue; }
+    p  { color: #444; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hello, World!&lt;/h1&gt;
+  &lt;p&gt;This is a dummy HTML page for demonstration purposes.&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Item 1&lt;/li&gt;
+    &lt;li&gt;Item 2&lt;/li&gt;
+    &lt;li&gt;Item 3&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;footer&gt;
+    &amp;copy; 2025 Example Inc.
+  &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
                 <label for="item_selector">
                     Item Selector
                     <input type="text" id="item_selector" name="item_selector" required>
@@ -54,6 +81,9 @@
                     <input type="text" id="link_selector" name="link_selector" required>
                     <small>CSS selector for the link within each item</small>
                 </label>
+
+
+
 
                 <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                     <button type="submit">Create Feed</button>
