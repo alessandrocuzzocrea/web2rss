@@ -37,6 +37,9 @@ COPY --from=builder /go/bin/migrate /usr/local/bin/migrate
 COPY --from=builder /app/templates ./templates
 COPY --from=builder /app/db/migrations ./db/migrations
 
+# Copy static files (CSS, JS, images)
+COPY --from=builder /app/static ./static
+
 # Copy entrypoint script
 COPY scripts/entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
