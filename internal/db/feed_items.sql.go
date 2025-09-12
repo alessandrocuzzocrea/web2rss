@@ -36,7 +36,7 @@ func (q *Queries) DeleteOldFeedItems(ctx context.Context, arg DeleteOldFeedItems
 }
 
 const getFeedItem = `-- name: GetFeedItem :one
-SELECT id, feed_id, title, description, link, created_at, updated_at FROM feed_items
+SELECT id, feed_id, title, description, link, created_at, updated_at, date FROM feed_items
 WHERE id = ? LIMIT 1
 `
 
@@ -51,14 +51,15 @@ func (q *Queries) GetFeedItem(ctx context.Context, id int64) (FeedItem, error) {
 		&i.Link,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Date,
 	)
 	return i, err
 }
 
 const listFeedItems = `-- name: ListFeedItems :many
-SELECT id, feed_id, title, description, link, created_at, updated_at FROM feed_items
+SELECT id, feed_id, title, description, link, created_at, updated_at, date FROM feed_items
 WHERE feed_id = ?
-ORDER BY created_at DESC
+ORDER BY COALESCE(date, created_at) DESC
 `
 
 func (q *Queries) ListFeedItems(ctx context.Context, feedID int64) ([]FeedItem, error) {
@@ -78,6 +79,7 @@ func (q *Queries) ListFeedItems(ctx context.Context, feedID int64) ([]FeedItem, 
 			&i.Link,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Date,
 		); err != nil {
 			return nil, err
 		}
@@ -93,8 +95,8 @@ func (q *Queries) ListFeedItems(ctx context.Context, feedID int64) ([]FeedItem, 
 }
 
 const upsertFeedItem = `-- name: UpsertFeedItem :many
-INSERT INTO feed_items (feed_id, title, description, link, updated_at)
-VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+INSERT INTO feed_items (feed_id, title, description, link, date, updated_at)
+VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 ON CONFLICT(feed_id, link) DO NOTHING
 RETURNING id
 `
@@ -104,6 +106,7 @@ type UpsertFeedItemParams struct {
 	Title       string         `json:"title"`
 	Description sql.NullString `json:"description"`
 	Link        string         `json:"link"`
+	Date        sql.NullTime   `json:"date"`
 }
 
 func (q *Queries) UpsertFeedItem(ctx context.Context, arg UpsertFeedItemParams) ([]int64, error) {
@@ -112,6 +115,7 @@ func (q *Queries) UpsertFeedItem(ctx context.Context, arg UpsertFeedItemParams) 
 		arg.Title,
 		arg.Description,
 		arg.Link,
+		arg.Date,
 	)
 	if err != nil {
 		return nil, err
