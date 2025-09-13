@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 concurrency:
-  group: main-pipeline
-  cancel-in-progress: true   # optional: cancel previous runs if a new one starts
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref_name }}
+  cancel-in-progress: true
 
 env:
   GO_VERSION: '1.25'
