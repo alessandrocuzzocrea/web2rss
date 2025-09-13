@@ -62,11 +62,21 @@ func (a *App) handleFeedRSS(w http.ResponseWriter, r *http.Request) {
 	// Convert to RSS items
 	rssItems := make([]Item, len(items))
 	for i, item := range items {
+		var pubDate time.Time
+		switch {
+		case item.Date.Valid:
+			pubDate = item.Date.Time
+		case item.CreatedAt.Valid:
+			pubDate = item.CreatedAt.Time
+		default:
+			pubDate = time.Now()
+		}
+
 		rssItems[i] = Item{
 			Title:       item.Title,
 			Link:        item.Link,
 			Description: item.Description.String,
-			PubDate:     formatRSSDate(item.CreatedAt.Time),
+			PubDate:     formatRSSDate(pubDate),
 		}
 	}
 
