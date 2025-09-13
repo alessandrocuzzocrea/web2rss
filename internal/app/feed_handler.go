@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"html"
 	"io"
 	"net/http"
 	"strconv"
@@ -105,53 +104,20 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 
 	// Render Step 2 HTML
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, err = fmt.Fprintf(w, `
-<div id="step-2">
-    <label for="item_selector">Item Selector
-        <input type="text" id="item_selector" name="item_selector" value="%s"
-               hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
-    </label>
-
-    <label for="title_selector">Title Selector
-        <input type="text" id="title_selector" name="title_selector" value="%s"
-		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
-
-    </label>
-
-    <label for="link_selector">Link Selector
-        <input type="text" id="link_selector" name="link_selector" value="%s"
-		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
-
-    </label>
-
-    <label for="date_selector">Date Selector (optional)
-        <input type="text" id="date_selector" name="date_selector" value="%s"
-		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
-
-    </label>
-
-    <button type="submit">Create Feed</button>
-    <a href="/" role="button" class="secondary">Cancel</a>
-
-    <h4>Preview</h4>
-    <p><strong>First item HTML:</strong></p>
-    <pre style="max-height:200px; overflow:auto;"><code>%s</code></pre>
-
-    <p><strong>Title:</strong> %s</p>
-    <p><strong>Link:</strong> %s</p>
-    <p><strong>Date:</strong> %s</p>
-</div>
-`, html.EscapeString(itemSelector), html.EscapeString(titleSelector),
-		html.EscapeString(linkSelector), html.EscapeString(dateSelector),
-		html.EscapeString(firstHTML), html.EscapeString(firstTitle),
-		html.EscapeString(firstLink), html.EscapeString(firstDate))
-
-	if err != nil {
-		_ = fmt.Errorf("failed to write response: %w", err)
+	//lets use feed-selector-partial.html
+	if err := a.templates.ExecuteTemplate(w, "feed-selector-partial.html", map[string]string{
+		"itemSelector":  itemSelector,
+		"titleSelector": titleSelector,
+		"linkSelector":  linkSelector,
+		"dateSelector":  dateSelector,
+		"firstHTML":     firstHTML,
+		"firstTitle":    firstTitle,
+		"firstLink":     firstLink,
+		"firstDate":     firstDate,
+	}); err != nil {
+		// print the err
+		fmt.Printf("Template error: %v\n", err)
+		http.Error(w, "Template error", http.StatusInternalServerError)
 		return
 	}
 }

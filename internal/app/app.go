@@ -44,10 +44,19 @@ func New() (*App, error) {
 
 	queries := db.New(database)
 
+	templates := template.New("")
+
+	dirs := []string{
+		"templates/*.html",
+		"templates/partials/*.html",
+	}
+
 	// Load templates
-	templates, err := template.ParseGlob("templates/*.html")
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse templates: %w", err)
+	for _, dir := range dirs {
+		_, err := templates.ParseGlob(dir)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse templates in %s: %w", dir, err)
+		}
 	}
 
 	app := &App{
