@@ -84,6 +84,21 @@ func (a *App) Run() error {
 		}
 	}()
 
+	pragmas := []string{
+		"PRAGMA journal_mode = WAL;",
+		"PRAGMA foreign_keys = ON;",
+		"PRAGMA synchronous = FULL;",
+		"PRAGMA temp_store = MEMORY;",
+		"PRAGMA busy_timeout = 5000;",
+		"PRAGMA strict = ON;",
+	}
+
+	for _, p := range pragmas {
+		if _, err := db.Exec(p); err != nil {
+			return fmt.Errorf("failed to set %s: %w", p, err)
+		}
+	}
+
 	// Test database connection
 	if err := db.PingContext(ctx); err != nil {
 		return fmt.Errorf("failed to ping database: %w", err)

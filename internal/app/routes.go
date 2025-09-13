@@ -25,6 +25,10 @@ func (a *App) Routes() *http.ServeMux {
 	mux.HandleFunc("POST /feed/{id}/edit", a.handleUpdateFeed)
 	mux.HandleFunc("POST /feed/{id}/refresh", a.handleRefreshFeed)
 
+	// Feed endpoints
+	// mux.HandleFunc("/feeds/", a.handleListFeeds)  // List all feeds
+	mux.HandleFunc("GET /feed/{id}/rss", a.handleFeedRSS) // Get RSS for specific feed
+
 	// Add a health endpoint
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -34,10 +38,6 @@ func (a *App) Routes() *http.ServeMux {
 			http.Error(w, "Failed to write response", http.StatusInternalServerError)
 		}
 	})
-
-	// Feed endpoints
-	// mux.HandleFunc("/feeds/", a.handleListFeeds)  // List all feeds
-	mux.HandleFunc("GET /feed/{id}/rss", a.handleFeedRSS) // Get RSS for specific feed
 
 	return mux
 }
