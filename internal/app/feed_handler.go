@@ -110,27 +110,27 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
     <label for="item_selector">Item Selector
         <input type="text" id="item_selector" name="item_selector" value="%s"
                hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form">
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
     </label>
 
     <label for="title_selector">Title Selector
         <input type="text" id="title_selector" name="title_selector" value="%s"
 		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form">
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
 
     </label>
 
     <label for="link_selector">Link Selector
         <input type="text" id="link_selector" name="link_selector" value="%s"
 		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form">
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
 
     </label>
 
     <label for="date_selector">Date Selector (optional)
         <input type="text" id="date_selector" name="date_selector" value="%s"
 		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form">
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
 
     </label>
 
