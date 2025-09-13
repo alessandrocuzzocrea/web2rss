@@ -89,7 +89,7 @@ func (q *Queries) GetFeed(ctx context.Context, id int64) (Feed, error) {
 
 const listFeeds = `-- name: ListFeeds :many
 SELECT id, name, url, item_selector, title_selector, link_selector, description_selector, created_at, updated_at, last_refreshed_at, date_selector FROM feeds
-ORDER BY name
+ORDER BY id
 `
 
 func (q *Queries) ListFeeds(ctx context.Context) ([]Feed, error) {
@@ -132,7 +132,7 @@ SELECT f.id, f.name, f.url, f.item_selector, f.title_selector, f.link_selector, 
 FROM feeds f
 LEFT JOIN feed_items i ON f.id = i.feed_id
 GROUP BY f.id
-ORDER BY f.name
+ORDER BY f.id
 `
 
 type ListFeedsWithItemsCountRow struct {

@@ -4,14 +4,14 @@ WHERE id = ? LIMIT 1;
 
 -- name: ListFeeds :many
 SELECT * FROM feeds
-ORDER BY name;
+ORDER BY id;
 
 -- name: ListFeedsWithItemsCount :many
 SELECT f.*, COUNT(i.id) AS items_count
 FROM feeds f
 LEFT JOIN feed_items i ON f.id = i.feed_id
 GROUP BY f.id
-ORDER BY f.name;
+ORDER BY f.id;
 
 -- name: CreateFeed :one
 INSERT INTO feeds (name, url, item_selector, title_selector, link_selector, description_selector, date_selector)
