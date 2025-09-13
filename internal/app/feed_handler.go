@@ -1,13 +1,16 @@
 package app
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"html"
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/alessandrocuzzocrea/web2rss/internal/db"
 )
 
@@ -31,49 +34,103 @@ func (a *App) handleNewFeed(w http.ResponseWriter, r *http.Request) {
 func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
 	}
 
+	// Parse form data
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
-		return
 	}
 
 	url := r.FormValue("url")
 	if url == "" {
 		http.Error(w, "URL is required", http.StatusBadRequest)
-		return
 	}
 
+	itemSelector := r.FormValue("item_selector")
+	titleSelector := r.FormValue("title_selector")
+	linkSelector := r.FormValue("link_selector")
+	dateSelector := r.FormValue("date_selector")
+
+	// Fetch HTML
 	resp, err := http.Get(url)
 	if err != nil {
 		http.Error(w, "Failed to fetch URL", http.StatusInternalServerError)
-		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		http.Error(w, "Failed to fetch URL", http.StatusInternalServerError)
-		return
 	}
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		http.Error(w, "Failed to read response", http.StatusInternalServerError)
-		return
 	}
 
-	// Escape the HTML so we can show it safely inside <code>
-	escapedBody := html.EscapeString(string(bodyBytes))
+	// Parse HTML with GoQuery
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(bodyBytes))
+	if err != nil {
+		http.Error(w, "Failed to parse HTML", http.StatusInternalServerError)
+	}
 
+	// Collect preview items
+	type previewItem struct {
+		Title string
+		Link  string
+		Date  string
+	}
+
+	var previews []previewItem
+
+	doc.Find(itemSelector).Each(func(i int, s *goquery.Selection) {
+		title := strings.TrimSpace(s.Find(titleSelector).Text())
+		link, exists := s.Find(linkSelector).Attr("href")
+		if !exists {
+			link = strings.TrimSpace(s.Find(linkSelector).Text())
+		}
+
+		var dateStr string
+		if dateSelector != "" {
+			dateStr = strings.TrimSpace(s.Find(dateSelector).Text())
+			if idx := strings.Index(dateStr, " "); idx != -1 {
+				dateStr = dateStr[:idx]
+			}
+		}
+
+		// Make link absolute if relative
+		if strings.HasPrefix(link, "/") {
+			link = resp.Request.URL.Scheme + "://" + resp.Request.URL.Host + link
+		}
+
+		previews = append(previews, previewItem{
+			Title: title,
+			Link:  link,
+			Date:  dateStr,
+		})
+	})
+
+	// Send OOB HTML updates
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	fmt.Fprintf(w, `<code id="html-preview" hx-swap-oob="true">%s</code>`, escapedBody)
-	fmt.Fprint(w, `
-<p id="selected-item-preview" hx-swap-oob="true"><em>Matched 5 items</em></p>
-<p id="selected-title-preview" hx-swap-oob="true"><em>First title: "Hello World"</em></p>
-<p id="selected-link-preview" hx-swap-oob="true"><em>Link found: https://example.com/post</em></p>
-<p id="selected-date-preview" hx-swap-oob="true"><em>Date parsed: 2025-09-13</em></p>`)
+	// HTML preview (escaped)
+	fmt.Fprintf(w, `<code id="html-preview" hx-swap-oob="true">%s</code>`, html.EscapeString(string(bodyBytes)))
+
+	// Item previews
+	if len(previews) > 0 {
+		fmt.Fprintf(w, `<p id="selected-item-preview" hx-swap-oob="true"><em>Matched %d items</em></p>`, len(previews))
+		fmt.Fprintf(w, `<p id="selected-title-preview" hx-swap-oob="true"><em>First title: %q</em></p>`, previews[0].Title)
+		fmt.Fprintf(w, `<p id="selected-link-preview" hx-swap-oob="true"><em>Link found: %s</em></p>`, previews[0].Link)
+		fmt.Fprintf(w, `<p id="selected-date-preview" hx-swap-oob="true"><em>Date parsed: %s</em></p>`, previews[0].Date)
+	} else {
+		fmt.Fprint(w, `
+<p id="selected-item-preview" hx-swap-oob="true"><em>No items matched</em></p>
+<p id="selected-title-preview" hx-swap-oob="true"><em>No title</em></p>
+<p id="selected-link-preview" hx-swap-oob="true"><em>No link</em></p>
+<p id="selected-date-preview" hx-swap-oob="true"><em>No date</em></p>
+`)
+	}
+
+	return
 }
 
 func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
@@ -249,31 +306,9 @@ func (a *App) handleRefreshFeed(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// func (a *App) fetchFeedPreview(ctx context.Context, url, itemSelector, titleSelector, linkSelector string) ([]FeedItem, error) {
-// 	// This is a placeholder implementation.
-// 	// In a real application, you would fetch the URL, parse the HTML,
-// 	// and extract items based on the provided selectors.
-
-// 	// For demonstration, return some dummy items.
-// 	items := []FeedItem{
-// 		{Title: "Sample Item 1", Link: "https://example.com/item1"},
-// 		{Title: "Sample Item 2", Link: "https://example.com/item2"},
-// 		{Title: "Sample Item 3", Link: "https://example.com/item3"},
-// 	}
-
-// 	return items, nil
-// }
-
 func nullStringToString(ns sql.NullString) string {
 	if ns.Valid {
 		return ns.String
 	}
 	return ""
 }
-
-// func stringToNullString(s string) sql.NullString {
-// 	if s == "" {
-// 		return sql.NullString{Valid: false}
-// 	}
-// 	return sql.NullString{String: s, Valid: true}
-// }
