@@ -3,6 +3,8 @@ package app
 import (
 	"database/sql"
 	"fmt"
+	"html"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -24,6 +26,56 @@ func (a *App) handleNewFeed(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Template error", http.StatusInternalServerError)
 		return
 	}
+}
+
+func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse form data
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
+		return
+	}
+
+	url := r.FormValue("url")
+	// item_selector := r.FormValue("item_selector")
+	// title_selector := r.FormValue("title_selector")
+	// link_selector := r.FormValue("link_selector")
+
+	if url == "" {
+		http.Error(w, "URL is required", http.StatusBadRequest)
+		return
+	}
+
+	// fetch real html use http.Get
+	resp, err := http.Get(url)
+	if err != nil {
+		http.Error(w, "Failed to fetch URL", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		http.Error(w, "Failed to fetch URL", http.StatusInternalServerError)
+		return
+	}
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "Failed to read response", http.StatusInternalServerError)
+		return
+	}
+
+	// Escape HTML so it can be shown literally in <code>
+	escaped := html.EscapeString(string(bodyBytes))
+
+	// Set content type to HTML
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	// Write escaped HTML to the <code> block
+	fmt.Fprint(w, escaped)
 }
 
 func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
@@ -198,6 +250,21 @@ func (a *App) handleRefreshFeed(w http.ResponseWriter, r *http.Request) {
 	// Redirect back to the homepage after successful refresh
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+// func (a *App) fetchFeedPreview(ctx context.Context, url, itemSelector, titleSelector, linkSelector string) ([]FeedItem, error) {
+// 	// This is a placeholder implementation.
+// 	// In a real application, you would fetch the URL, parse the HTML,
+// 	// and extract items based on the provided selectors.
+
+// 	// For demonstration, return some dummy items.
+// 	items := []FeedItem{
+// 		{Title: "Sample Item 1", Link: "https://example.com/item1"},
+// 		{Title: "Sample Item 2", Link: "https://example.com/item2"},
+// 		{Title: "Sample Item 3", Link: "https://example.com/item3"},
+// 	}
+
+// 	return items, nil
+// }
 
 func nullStringToString(ns sql.NullString) string {
 	if ns.Valid {

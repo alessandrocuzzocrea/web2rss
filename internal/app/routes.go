@@ -19,6 +19,7 @@ func (a *App) Routes() *http.ServeMux {
 	mux.HandleFunc("/", a.handleHomepage)
 
 	mux.HandleFunc("GET /feed/new", a.handleNewFeed)
+	mux.HandleFunc("POST /feed/preview", a.handlePreviewFeed)
 	mux.HandleFunc("POST /feed/", a.handleCreateFeed)
 	mux.HandleFunc("GET /feed/{id}/edit", a.handleEditFeed)
 	mux.HandleFunc("POST /feed/{id}/edit", a.handleUpdateFeed)

@@ -26,72 +26,78 @@
     <main class="container">
         <section>
             <h2>New Feed</h2>
-            <form action="/feed/new" method="post">
-                <label for="name">
-                    Feed Name
-                    <input type="text" id="name" name="name" required>
-                </label>
 
-                <label for="url">
-                    Website URL
-                    <input type="url" id="url" name="url" required>
-                </label>
+            <!-- Wrap form in a container -->
+            <div id="form-container">
+                <form action="/feed/new" method="post">
+                    <label for="name">
+                        Feed Name
+                        <input type="text" id="name" name="name" required>
+                    </label>
 
-                <pre><code>&lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;
-  &lt;meta charset="UTF-8"&gt;
-  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-  &lt;title&gt;Dummy Page&lt;/title&gt;
-  &lt;style&gt;
-    body { font-family: Arial, sans-serif; margin: 2rem; }
-    h1 { color: darkblue; }
-    p  { color: #444; }
-  &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;h1&gt;Hello, World!&lt;/h1&gt;
-  &lt;p&gt;This is a dummy HTML page for demonstration purposes.&lt;/p&gt;
-  &lt;ul&gt;
-    &lt;li&gt;Item 1&lt;/li&gt;
-    &lt;li&gt;Item 2&lt;/li&gt;
-    &lt;li&gt;Item 3&lt;/li&gt;
-  &lt;/ul&gt;
-  &lt;footer&gt;
-    &amp;copy; 2025 Example Inc.
-  &lt;/footer&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
+                    <label for="url">
+                        Website URL
+                        <input
+                            type="url" id="url" name="url" required
+                            hx-post="/feed/preview"
+                            hx-target="#html-preview"
+                            hx-trigger="keyup changed delay:200ms"
+                            hx-include="#url,#item_selector,#title_selector,#link_selector,#date_selector"
+                        >
+                    </label>
 
-                <label for="item_selector">
-                    Item Selector
-                    <input type="text" id="item_selector" name="item_selector" required>
-                    <small>CSS selector for each item/article on the page</small>
-                </label>
+                    <pre style="max-height: 200px; overflow: auto;"><code id="html-preview"></code></pre>
 
-                <label for="title_selector">
-                    Title Selector
-                    <input type="text" id="title_selector" name="title_selector" required>
-                    <small>CSS selector for the title within each item</small>
-                </label>
+                    <label for="item_selector">
+                        Item Selector
+                        <input type="text" id="item_selector" name="item_selector" required>
+                        <small>CSS selector for each item/article on the page</small>
+                    </label>
+                    <p id="selected-item-preview" style="background: #f6f8fa; padding: 0.5rem; border-radius: 4px; min-height: 2em;">
+                      <em>No item selected yet.</em>
+                    </p>
 
-                <label for="link_selector">
-                    Link Selector
-                    <input type="text" id="link_selector" name="link_selector" required>
-                    <small>CSS selector for the link within each item</small>
-                </label>
+                    <label for="title_selector">
+                        Title Selector
+                        <input type="text" id="title_selector" name="title_selector" required>
+                        <small>CSS selector for the title within each item</small>
+                    </label>
+                    <p id="selected-title-preview" style="background: #f6f8fa; padding: 0.5rem; border-radius: 4px; min-height: 2em;">
+                      <em>No title selected yet.</em>
+                    </p>
 
+                    <label for="link_selector">
+                        Link Selector
+                        <input type="text" id="link_selector" name="link_selector" required>
+                        <small>CSS selector for the link within each item</small>
+                    </label>
+                    <p id="selected-link-preview" style="background: #f6f8fa; padding: 0.5rem; border-radius: 4px; min-height: 2em;">
+                      <em>No link selected yet.</em>
+                    </p>
 
+                    <label for="date_selector">
+                        Date Selector (optional)
+                        <input type="text" id="date_selector" name="date_selector">
+                        <small>CSS selector for the date within each item</small>
+                    </label>
+                    <p id="selected-date-preview" style="background: #f6f8fa; padding: 0.5rem; border-radius: 4px; min-height: 2em;">
+                      <em>No date selected yet.</em>
+                    </p>
 
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button type="submit">Create Feed</button>
+                        <a href="/" role="button" class="secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
 
-                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                    <button type="submit">Create Feed</button>
-                    <a href="/" role="button" class="secondary">Cancel</a>
-                </div>
-            </form>
+            <!-- Preview container -->
+            <div id="preview-container" style="margin-top: 2rem;">
+                <!-- Server will inject live preview here -->
+            </div>
+
         </section>
- </main>
+    </main>
 
     <footer class="container">
         <p>
