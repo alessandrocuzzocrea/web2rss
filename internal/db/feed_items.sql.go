@@ -10,28 +10,13 @@ import (
 	"database/sql"
 )
 
-const deleteFeedItem = `-- name: DeleteFeedItem :exec
+const deleteItemsByFeedID = `-- name: DeleteItemsByFeedID :exec
 DELETE FROM feed_items
-WHERE id = ?
+WHERE feed_id = ?
 `
 
-func (q *Queries) DeleteFeedItem(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteFeedItem, id)
-	return err
-}
-
-const deleteOldFeedItems = `-- name: DeleteOldFeedItems :exec
-DELETE FROM feed_items
-WHERE feed_id = ? AND created_at < ?
-`
-
-type DeleteOldFeedItemsParams struct {
-	FeedID    int64        `json:"feed_id"`
-	CreatedAt sql.NullTime `json:"created_at"`
-}
-
-func (q *Queries) DeleteOldFeedItems(ctx context.Context, arg DeleteOldFeedItemsParams) error {
-	_, err := q.db.ExecContext(ctx, deleteOldFeedItems, arg.FeedID, arg.CreatedAt)
+func (q *Queries) DeleteItemsByFeedID(ctx context.Context, feedID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteItemsByFeedID, feedID)
 	return err
 }
 
