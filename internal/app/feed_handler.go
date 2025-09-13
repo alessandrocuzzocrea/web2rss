@@ -34,16 +34,19 @@ func (a *App) handleNewFeed(w http.ResponseWriter, r *http.Request) {
 func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
 
 	// Parse form data
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
+		http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		return
 	}
 
 	url := r.FormValue("url")
 	if url == "" {
-		http.Error(w, "URL is required", http.StatusBadRequest)
+		http.Error(w, "URL required", http.StatusBadRequest)
+		return
 	}
 
 	itemSelector := r.FormValue("item_selector")
@@ -51,83 +54,89 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	linkSelector := r.FormValue("link_selector")
 	dateSelector := r.FormValue("date_selector")
 
-	// Fetch HTML
+	// Fetch URL
 	resp, err := http.Get(url)
-	if err != nil {
-		http.Error(w, "Failed to fetch URL", http.StatusInternalServerError)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, `<p style="color:red;">Failed to fetch URL</p>`)
+		return
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		http.Error(w, "Failed to fetch URL", http.StatusInternalServerError)
-	}
-
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		http.Error(w, "Failed to read response", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, `<p style="color:red;">Failed to read URL</p>`)
+		return
 	}
 
-	// Parse HTML with GoQuery
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(bodyBytes))
 	if err != nil {
-		http.Error(w, "Failed to parse HTML", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, `<p style="color:red;">Failed to parse HTML</p>`)
+		return
 	}
 
-	// Collect preview items
-	type previewItem struct {
-		HTML  string
-		Title string
-		Link  string
-		Date  string
+	// First matched item
+	first := doc.Find(itemSelector).First()
+	firstTitle := strings.TrimSpace(first.Find(titleSelector).Text())
+	firstLink, _ := first.Find(linkSelector).Attr("href")
+	if firstLink == "" {
+		firstLink = strings.TrimSpace(first.Find(linkSelector).Text())
 	}
 
-	// Find the first matched item
-	firstItem := doc.Find(itemSelector).First()
-
-	title := strings.TrimSpace(firstItem.Find(titleSelector).Text())
-	link, exists := firstItem.Find(linkSelector).Attr("href")
-	if !exists {
-		link = strings.TrimSpace(firstItem.Find(linkSelector).Text())
-	}
-
-	var dateStr string
+	firstDate := ""
 	if dateSelector != "" {
-		dateStr = strings.TrimSpace(firstItem.Find(dateSelector).Text())
-		if idx := strings.Index(dateStr, " "); idx != -1 {
-			dateStr = dateStr[:idx]
+		firstDate = strings.TrimSpace(first.Find(dateSelector).Text())
+		if idx := strings.Index(firstDate, " "); idx != -1 {
+			firstDate = firstDate[:idx]
 		}
 	}
 
-	// Make link absolute if relative
-	if strings.HasPrefix(link, "/") {
-		link = resp.Request.URL.Scheme + "://" + resp.Request.URL.Host + link
+	// Absolute link if needed
+	if strings.HasPrefix(firstLink, "/") {
+		firstLink = resp.Request.URL.Scheme + "://" + resp.Request.URL.Host + firstLink
 	}
 
-	firstItemHtml, err := firstItem.Html()
-	if err != nil {
-		http.Error(w, "Failed to get item HTML", http.StatusInternalServerError)
-	}
+	firstHTML, _ := first.Html()
 
-	// Prepare a single preview
-	preview := previewItem{
-		HTML:  firstItemHtml,
-		Title: title,
-		Link:  link,
-		Date:  dateStr,
-	}
-
-	// Send OOB HTML updates
+	// Render Step 2 HTML
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintf(w, `
+<div id="step-2">
+    <label for="item_selector">Item Selector
+        <input type="text" id="item_selector" name="item_selector" value="%s"
+               hx-post="/feed/preview" hx-trigger="change delay:300ms"
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form">
+    </label>
 
-	// HTML preview (escaped)
-	fmt.Fprintf(w, `<code id="html-preview" hx-swap-oob="true">%s</code>`, html.EscapeString(string(bodyBytes)))
+    <label for="title_selector">Title Selector
+        <input type="text" id="title_selector" name="title_selector" value="%s">
+    </label>
 
-	// HTML preview for the first matched item (escaped)
-	fmt.Fprintf(w, `<code id="selected-item-preview" hx-swap-oob="true">%s</code>`, html.EscapeString(preview.HTML))
+    <label for="link_selector">Link Selector
+        <input type="text" id="link_selector" name="link_selector" value="%s">
+    </label>
 
-	fmt.Fprintf(w, `<p id="selected-title-preview" hx-swap-oob="true"><em>First title: %q</em></p>`, preview.Title)
-	fmt.Fprintf(w, `<p id="selected-link-preview" hx-swap-oob="true"><em>Link found: %s</em></p>`, preview.Link)
-	fmt.Fprintf(w, `<p id="selected-date-preview" hx-swap-oob="true"><em>Date parsed: %s</em></p>`, preview.Date)
+    <label for="date_selector">Date Selector (optional)
+        <input type="text" id="date_selector" name="date_selector" value="%s">
+    </label>
+
+    <button type="submit">Create Feed</button>
+    <a href="/" role="button" class="secondary">Cancel</a>
+
+    <h4>Preview</h4>
+    <p><strong>First item HTML:</strong></p>
+    <pre style="max-height:200px; overflow:auto;"><code>%s</code></pre>
+
+    <p><strong>Title:</strong> %s</p>
+    <p><strong>Link:</strong> %s</p>
+    <p><strong>Date:</strong> %s</p>
+</div>
+`, html.EscapeString(itemSelector), html.EscapeString(titleSelector),
+		html.EscapeString(linkSelector), html.EscapeString(dateSelector),
+		html.EscapeString(firstHTML), html.EscapeString(firstTitle),
+		html.EscapeString(firstLink), html.EscapeString(firstDate))
 }
 
 func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {

@@ -10,26 +10,27 @@
     <meta name="description" content="Convert websites to RSS feeds">
 </head>
 <body>
-    <header class="container">
-        <nav>
-            <ul>
-                <li><strong>🌐 web2rss</strong></li>
-            </ul>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/feeds">Feeds</a></li>
-                <li><a href="/health">Health</a></li>
-            </ul>
-        </nav>
-    </header>
+<header class="container">
+    <nav>
+        <ul>
+            <li><strong>🌐 web2rss</strong></li>
+        </ul>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/feeds">Feeds</a></li>
+            <li><a href="/health">Health</a></li>
+        </ul>
+    </nav>
+</header>
 
-    <main class="container">
-        <section>
-            <h2>New Feed</h2>
+<main class="container">
+    <section>
+        <h2>New Feed</h2>
 
-            <!-- Wrap form in a container -->
-            <div id="form-container">
-                <form action="/feed/new" method="post">
+        <div id="form-container">
+            <form action="/feed/new" method="post">
+                <!-- Step 1: URL input -->
+                <div id="step-1">
                     <label for="name">
                         Feed Name
                         <input type="text" id="name" name="name" required>
@@ -37,89 +38,21 @@
 
                     <label for="url">
                         Website URL
-                        <input
-                            type="url" id="url" name="url" required
-                            hx-post="/feed/preview"
-                            hx-trigger="keyup changed delay:200ms"
-                            hx-include="closest form"
-                        >
+                        <input type="url" id="url" name="url" required
+                               hx-post="/feed/preview"
+                               hx-trigger="change delay:500ms"
+                               hx-target="#step-2"
+                               hx-swap="innerHTML">
                     </label>
+                </div>
 
-                    <pre style="max-height: 200px; overflow: auto;"><code id="html-preview"></code></pre>
-
-                    <label for="item_selector">
-                        Item Selector
-                        <input type="text" id="item_selector" name="item_selector" required
-                            hx-post="/feed/preview"
-                            hx-trigger="keyup changed delay:200ms"
-                            hx-include="closest form"
-                        >
-                        <small>CSS selector for each item/article on the page</small>
-                    </label>
-                    <p id="selected-item-preview" style="background: #f6f8fa; padding: 0.5rem; border-radius: 4px; min-height: 2em;">
-                      <em>No item selected yet.</em>
-                    </p>
-
-                    <label for="title_selector">
-                        Title Selector
-                        <input type="text" id="title_selector" name="title_selector" required
-                            hx-post="/feed/preview"
-                            hx-trigger="keyup changed delay:200ms"
-                            hx-include="closest form"
-                        >
-                        <small>CSS selector for the title within each item</small>
-                    </label>
-                    <p id="selected-title-preview" style="background: #f6f8fa; padding: 0.5rem; border-radius: 4px; min-height: 2em;">
-                      <em>No title selected yet.</em>
-                    </p>
-
-                    <label for="link_selector">
-                        Link Selector
-                        <input type="text" id="link_selector" name="link_selector" required
-                            hx-post="/feed/preview"
-                            hx-trigger="keyup changed delay:200ms"
-                            hx-include="closest form"
-                        >
-                        <small>CSS selector for the link within each item</small>
-                    </label>
-                    <p id="selected-link-preview" style="background: #f6f8fa; padding: 0.5rem; border-radius: 4px; min-height: 2em;">
-                      <em>No link selected yet.</em>
-                    </p>
-
-                    <label for="date_selector">
-                        Date Selector (optional)
-                        <input type="text" id="date_selector" name="date_selector"
-                            hx-post="/feed/preview"
-                            hx-trigger="keyup changed delay:200ms"
-                            hx-include="closest form"
-                        >
-                        <small>CSS selector for the date within each item</small>
-                    </label>
-                    <p id="selected-date-preview" style="background: #f6f8fa; padding: 0.5rem; border-radius: 4px; min-height: 2em;">
-                      <em>No date selected yet.</em>
-                    </p>
-
-                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                        <button type="submit">Create Feed</button>
-                        <a href="/" role="button" class="secondary">Cancel</a>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Preview container -->
-            <div id="preview-container" style="margin-top: 2rem;">
-                <!-- Server will inject live preview here -->
-            </div>
-
-        </section>
-    </main>
-
-    <footer class="container">
-        <p>
-            <a href="https://github.com/alessandrocuzzocrea/web2rss" target="_blank" rel="noopener">
-                View on GitHub
-            </a>
-        </p>
-    </footer>
+                <!-- Step 2: This will be injected by the server if the URL is valid -->
+                <div id="step-2">
+                    <!-- Initially empty -->
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
 </body>
 </html>
