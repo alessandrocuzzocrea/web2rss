@@ -26,6 +26,8 @@
 <main class="container">
     <section>
         <h2>New Feed</h2>
+        <div id="loader" class="htmx-indicator">⏳ Fetching preview...</div>
+
 
         <div id="form-container">
             <form action="/feed/new" method="post">
@@ -42,7 +44,8 @@
                                hx-post="/feed/preview"
                                hx-trigger="change delay:500ms"
                                hx-target="#step-2"
-                               hx-swap="innerHTML">
+                               hx-swap="innerHTML"
+                               hx-indicator="#loader">
                     </label>
                 </div>
 
