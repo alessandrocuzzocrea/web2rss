@@ -58,22 +58,25 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, `<p style="color:red;">Failed to fetch URL</p>`)
+		_ = fmt.Errorf("failed to fetch URL: %w", err)
 		return
 	}
-	defer resp.Body.Close()
+	defer func() {
+		err = resp.Body.Close()
+		_ = fmt.Errorf("failed to close response body: %w", err)
+	}()
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, `<p style="color:red;">Failed to read URL</p>`)
+		_ = fmt.Errorf("failed to read URL: %w", err)
 		return
 	}
 
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(bodyBytes))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, `<p style="color:red;">Failed to parse HTML</p>`)
+		_ = fmt.Errorf("failed to parse HTML: %w", err)
 		return
 	}
 
@@ -102,7 +105,7 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 
 	// Render Step 2 HTML
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, `
+	_, err = fmt.Fprintf(w, `
 <div id="step-2">
     <label for="item_selector">Item Selector
         <input type="text" id="item_selector" name="item_selector" value="%s"
@@ -146,6 +149,11 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 		html.EscapeString(linkSelector), html.EscapeString(dateSelector),
 		html.EscapeString(firstHTML), html.EscapeString(firstTitle),
 		html.EscapeString(firstLink), html.EscapeString(firstDate))
+
+	if err != nil {
+		_ = fmt.Errorf("failed to write response: %w", err)
+		return
+	}
 }
 
 func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
@@ -156,7 +164,7 @@ func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
 
 	// Parse form data
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
+		http.Error(w, "failed to parse form data", http.StatusBadRequest)
 		return
 	}
 
