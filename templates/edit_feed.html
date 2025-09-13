@@ -55,6 +55,12 @@
                     <small>CSS selector for the link within each item</small>
                 </label>
 
+                <label for="date_selector">
+                    Date Selector
+                    <input type="text" id="date_selector" name="date_selector" value="{{.DateSelector}}">
+                    <small>CSS selector for the publication date within each item (optional)</small>
+                </label>
+
                 <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                     <button type="submit">Update Feed</button>
                     <a href="/" role="button" class="secondary">Cancel</a>

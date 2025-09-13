@@ -11,8 +11,8 @@ import (
 )
 
 const createFeed = `-- name: CreateFeed :one
-INSERT INTO feeds (name, url, item_selector, title_selector, link_selector, description_selector)
-VALUES (?, ?, ?, ?, ?, ?)
+INSERT INTO feeds (name, url, item_selector, title_selector, link_selector, description_selector, date_selector)
+VALUES (?, ?, ?, ?, ?, ?, ?)
 RETURNING id, name, url, item_selector, title_selector, link_selector, description_selector, created_at, updated_at, last_refreshed_at, date_selector
 `
 
@@ -23,6 +23,7 @@ type CreateFeedParams struct {
 	TitleSelector       sql.NullString `json:"title_selector"`
 	LinkSelector        sql.NullString `json:"link_selector"`
 	DescriptionSelector sql.NullString `json:"description_selector"`
+	DateSelector        sql.NullString `json:"date_selector"`
 }
 
 func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (Feed, error) {
@@ -33,6 +34,7 @@ func (q *Queries) CreateFeed(ctx context.Context, arg CreateFeedParams) (Feed, e
 		arg.TitleSelector,
 		arg.LinkSelector,
 		arg.DescriptionSelector,
+		arg.DateSelector,
 	)
 	var i Feed
 	err := row.Scan(
@@ -186,7 +188,7 @@ func (q *Queries) ListFeedsWithItemsCount(ctx context.Context) ([]ListFeedsWithI
 
 const updateFeed = `-- name: UpdateFeed :exec
 UPDATE feeds
-SET name = ?, url = ?, item_selector = ?, title_selector = ?, link_selector = ?, description_selector = ?, updated_at = CURRENT_TIMESTAMP
+SET name = ?, url = ?, item_selector = ?, title_selector = ?, link_selector = ?, description_selector = ?, date_selector = ?, updated_at = CURRENT_TIMESTAMP
 WHERE id = ?
 `
 
@@ -197,6 +199,7 @@ type UpdateFeedParams struct {
 	TitleSelector       sql.NullString `json:"title_selector"`
 	LinkSelector        sql.NullString `json:"link_selector"`
 	DescriptionSelector sql.NullString `json:"description_selector"`
+	DateSelector        sql.NullString `json:"date_selector"`
 	ID                  int64          `json:"id"`
 }
 
@@ -208,6 +211,7 @@ func (q *Queries) UpdateFeed(ctx context.Context, arg UpdateFeedParams) error {
 		arg.TitleSelector,
 		arg.LinkSelector,
 		arg.DescriptionSelector,
+		arg.DateSelector,
 		arg.ID,
 	)
 	return err
