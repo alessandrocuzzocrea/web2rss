@@ -1,29 +1,16 @@
 <div id="step-2">
 
     {{/* copy selectors from existing, from a dropdown */}}
-    <select id="existing_selectors" name="existing_selectors"
-            hx-post="/feed/preview"
-            hx-trigger="change"
-            hx-target="#step-2"
-            hx-swap="innerHTML"
-            hx-include="closest form"
-            hx-indicator="#loader"
-            hx-vals='{
-                "item_selector": document.querySelector("#existing_selectors option:checked")?.dataset.item || "",
-                "title_selector": document.querySelector("#existing_selectors option:checked")?.dataset.title || "",
-                "link_selector": document.querySelector("#existing_selectors option:checked")?.dataset.link || "",
-                "date_selector": document.querySelector("#existing_selectors option:checked")?.dataset.date || ""
-            }'>
-        <option value="">-- Select Existing Selectors --</option>
-        {{range .ExistingSelectors}}
-        <option value="{{.Name}}"
-                data-item="{{.ItemSelector}}"
-                data-title="{{.TitleSelector}}"
-                data-link="{{.LinkSelector}}"
-                data-date="{{.DateSelector}}">
-            {{.Name}} ({{.Url}})
-        </option>
-        {{end}}
+    <select name="existing_selector_id"
+        hx-post="/feed/preview"
+        hx-target="#step-2"
+        hx-swap="innerHTML"
+        hx-indicator="#loader"
+        hx-trigger="change">
+      <option value="">-- Select Existing Selectors --</option>
+      {{range .ExistingSelectors}}
+      <option value="{{.ID}}">{{.ID}} ({{.Name}})</option>
+      {{end}}
     </select>
 
     <label for="item_selector">Item Selector

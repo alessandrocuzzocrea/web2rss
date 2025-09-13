@@ -54,6 +54,27 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	linkSelector := r.FormValue("link_selector")
 	dateSelector := r.FormValue("date_selector")
 
+	existingSelectorIDStr := r.FormValue("existing_selector_id")
+
+	if existingSelectorIDStr != "" {
+		existingSelectorID, err := strconv.ParseInt(existingSelectorIDStr, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid existing selectors ID", http.StatusBadRequest)
+			return
+		}
+
+		template_feed, err := a.queries.GetFeed(r.Context(), existingSelectorID)
+		if err != nil {
+			http.Error(w, "Failed to load existing selectors", http.StatusInternalServerError)
+			return
+		}
+
+		itemSelector = nullStringToString(template_feed.ItemSelector)
+		titleSelector = nullStringToString(template_feed.TitleSelector)
+		linkSelector = nullStringToString(template_feed.LinkSelector)
+		dateSelector = nullStringToString(template_feed.DateSelector)
+	}
+
 	// Fetch URL
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != http.StatusOK {
@@ -108,6 +129,7 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 
 	//prepare existing selectors to be used in the template
 	type Selector struct {
+		ID            string
 		Name          string
 		ItemSelector  string
 		TitleSelector string
@@ -140,12 +162,12 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	var selectors []Selector
 	for _, s := range ExistingSelectors {
 		selectors = append(selectors, Selector{
+			ID:            strconv.FormatInt(s.ID, 10),
 			Name:          s.Name,
 			ItemSelector:  nullStringToString(s.ItemSelector),
 			TitleSelector: nullStringToString(s.TitleSelector),
 			LinkSelector:  nullStringToString(s.LinkSelector),
 			DateSelector:  nullStringToString(s.DateSelector),
-			Url:           s.Url,
 		})
 	}
 
