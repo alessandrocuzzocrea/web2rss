@@ -303,6 +303,55 @@ func (a *App) handleUpdateFeed(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
+func (a *App) handleDeleteFeed(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	idStr := r.PathValue("id")
+	feedID, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid feed ID", http.StatusBadRequest)
+		return
+	}
+
+	// Delete the feed from the database
+	err = a.queries.DeleteFeed(r.Context(), feedID)
+	if err != nil {
+		http.Error(w, "Failed to delete feed", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect back to the homepage after successful deletion
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (a *App) handleResetFeedItems(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	idStr := r.PathValue("id")
+
+	feedID, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid feed ID", http.StatusBadRequest)
+		return
+	}
+
+	// Delete all items associated with the feed
+	err = a.queries.DeleteItemsByFeedID(r.Context(), feedID)
+	if err != nil {
+		http.Error(w, "Failed to reset feed items", http.StatusInternalServerError)
+		return
+	}
+
+	// Redirect back to the homepage after successful reset
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 func (a *App) handleRefreshFeed(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

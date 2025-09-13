@@ -13,10 +13,6 @@ VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 ON CONFLICT(feed_id, link) DO NOTHING
 RETURNING id;
 
--- name: DeleteFeedItem :exec
+-- name: DeleteItemsByFeedID :exec
 DELETE FROM feed_items
-WHERE id = ?;
-
--- name: DeleteOldFeedItems :exec
-DELETE FROM feed_items
-WHERE feed_id = ? AND created_at < ?;
+WHERE feed_id = ?;

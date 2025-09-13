@@ -18,11 +18,24 @@ func (a *App) Routes() *http.ServeMux {
 	// Homepage with HTML template
 	mux.HandleFunc("/", a.handleHomepage)
 
+	// Feed creation
 	mux.HandleFunc("GET /feed/new", a.handleNewFeed)
 	mux.HandleFunc("POST /feed/preview", a.handlePreviewFeed)
+
+	// Create feed
 	mux.HandleFunc("POST /feed/", a.handleCreateFeed)
+
+	// Edit feed
 	mux.HandleFunc("GET /feed/{id}/edit", a.handleEditFeed)
 	mux.HandleFunc("POST /feed/{id}/edit", a.handleUpdateFeed)
+
+	// Delete feed
+	mux.HandleFunc("POST /feed/{id}/delete", a.handleDeleteFeed)
+
+	// Reset feed items
+	mux.HandleFunc("POST /feed/{id}/reset", a.handleResetFeedItems)
+
+	// Refresh feed
 	mux.HandleFunc("POST /feed/{id}/refresh", a.handleRefreshFeed)
 
 	// Feed endpoints
