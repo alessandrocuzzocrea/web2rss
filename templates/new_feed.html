@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="/css/vendor/pico.min.css">
+    <script src="/js/vendor/htmx.js"></script>
+    <title>{{.Name}} - web2rss</title>
+    <meta name="description" content="Convert websites to RSS feeds">
+</head>
+<body>
+<header class="container">
+    <nav>
+        <ul>
+            <li><strong>🌐 web2rss</strong></li>
+        </ul>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/feeds">Feeds</a></li>
+            <li><a href="/health">Health</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="container">
+    <section>
+        <h2>New Feed</h2>
+
+        <div id="form-container">
+            <form action="/feed/new" method="post">
+                <!-- Step 1: URL input -->
+                <div id="step-1">
+                    <label for="name">
+                        Feed Name
+                        <input type="text" id="name" name="name" required>
+                    </label>
+
+                    <label for="url">
+                        Website URL
+                        <input type="url" id="url" name="url" required
+                               hx-post="/feed/preview"
+                               hx-trigger="change delay:500ms"
+                               hx-target="#step-2"
+                               hx-swap="innerHTML">
+                    </label>
+                </div>
+
+                <!-- Step 2: This will be injected by the server if the URL is valid -->
+                <div id="step-2">
+                    <!-- Initially empty -->
+                </div>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

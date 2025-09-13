@@ -1,13 +1,160 @@
 package app
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
+	"html"
+	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/alessandrocuzzocrea/web2rss/internal/db"
 )
+
+func (a *App) handleNewFeed(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	// Execute the template
+	if err := a.templates.ExecuteTemplate(w, "new_feed.html", nil); err != nil {
+		// print the err
+		fmt.Printf("Template error: %v\n", err)
+		http.Error(w, "Template error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse form data
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Failed to parse form", http.StatusBadRequest)
+		return
+	}
+
+	url := r.FormValue("url")
+	if url == "" {
+		http.Error(w, "URL required", http.StatusBadRequest)
+		return
+	}
+
+	itemSelector := r.FormValue("item_selector")
+	titleSelector := r.FormValue("title_selector")
+	linkSelector := r.FormValue("link_selector")
+	dateSelector := r.FormValue("date_selector")
+
+	// Fetch URL
+	resp, err := http.Get(url)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = fmt.Errorf("failed to fetch URL: %w", err)
+		return
+	}
+	defer func() {
+		err = resp.Body.Close()
+		_ = fmt.Errorf("failed to close response body: %w", err)
+	}()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = fmt.Errorf("failed to read URL: %w", err)
+		return
+	}
+
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(bodyBytes))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = fmt.Errorf("failed to parse HTML: %w", err)
+		return
+	}
+
+	// First matched item
+	first := doc.Find(itemSelector).First()
+	firstTitle := strings.TrimSpace(first.Find(titleSelector).Text())
+	firstLink, _ := first.Find(linkSelector).Attr("href")
+	if firstLink == "" {
+		firstLink = strings.TrimSpace(first.Find(linkSelector).Text())
+	}
+
+	firstDate := ""
+	if dateSelector != "" {
+		firstDate = strings.TrimSpace(first.Find(dateSelector).Text())
+		if idx := strings.Index(firstDate, " "); idx != -1 {
+			firstDate = firstDate[:idx]
+		}
+	}
+
+	// Absolute link if needed
+	if strings.HasPrefix(firstLink, "/") {
+		firstLink = resp.Request.URL.Scheme + "://" + resp.Request.URL.Host + firstLink
+	}
+
+	firstHTML, _ := first.Html()
+
+	// Render Step 2 HTML
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, err = fmt.Fprintf(w, `
+<div id="step-2">
+    <label for="item_selector">Item Selector
+        <input type="text" id="item_selector" name="item_selector" value="%s"
+               hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form">
+    </label>
+
+    <label for="title_selector">Title Selector
+        <input type="text" id="title_selector" name="title_selector" value="%s"
+		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form">
+
+    </label>
+
+    <label for="link_selector">Link Selector
+        <input type="text" id="link_selector" name="link_selector" value="%s"
+		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form">
+
+    </label>
+
+    <label for="date_selector">Date Selector (optional)
+        <input type="text" id="date_selector" name="date_selector" value="%s"
+		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form">
+
+    </label>
+
+    <button type="submit">Create Feed</button>
+    <a href="/" role="button" class="secondary">Cancel</a>
+
+    <h4>Preview</h4>
+    <p><strong>First item HTML:</strong></p>
+    <pre style="max-height:200px; overflow:auto;"><code>%s</code></pre>
+
+    <p><strong>Title:</strong> %s</p>
+    <p><strong>Link:</strong> %s</p>
+    <p><strong>Date:</strong> %s</p>
+</div>
+`, html.EscapeString(itemSelector), html.EscapeString(titleSelector),
+		html.EscapeString(linkSelector), html.EscapeString(dateSelector),
+		html.EscapeString(firstHTML), html.EscapeString(firstTitle),
+		html.EscapeString(firstLink), html.EscapeString(firstDate))
+
+	if err != nil {
+		_ = fmt.Errorf("failed to write response: %w", err)
+		return
+	}
+}
 
 func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -17,7 +164,7 @@ func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
 
 	// Parse form data
 	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
+		http.Error(w, "failed to parse form data", http.StatusBadRequest)
 		return
 	}
 
@@ -188,10 +335,3 @@ func nullStringToString(ns sql.NullString) string {
 	}
 	return ""
 }
-
-// func stringToNullString(s string) sql.NullString {
-// 	if s == "" {
-// 		return sql.NullString{Valid: false}
-// 	}
-// 	return sql.NullString{String: s, Valid: true}
-// }

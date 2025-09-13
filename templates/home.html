@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="/css/vendor/pico.min.css">
+    <script src="/js/vendor/htmx.js"></script>
     <style>
         /* Responsive table improvements */
         table {
@@ -60,18 +61,7 @@
 
     <main class="container">
         <section>
-            <h2>Add new feed</h2>
-            <form action="/feed/" method="post">
-                <label for="name">
-                    Feed Name
-                    <input type="text" id="name" name="name" required>
-                </label>
-                <label for="url">
-                    Website URL
-                    <input type="url" id="url" name="url" required>
-                </label>
-                <button type="submit">Create Feed</button>
-            </form>
+            <a href="/feed/new">Add new feed</a>
         </section>
 
         <section>
