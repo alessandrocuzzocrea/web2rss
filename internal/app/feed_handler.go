@@ -173,6 +173,7 @@ func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
 	item_selector := r.FormValue("item_selector")
 	title_selector := r.FormValue("title_selector")
 	link_selector := r.FormValue("link_selector")
+	date_selector := r.FormValue("date_selector")
 
 	if name == "" || url == "" {
 		http.Error(w, "Name and URL are required", http.StatusBadRequest)
@@ -186,6 +187,7 @@ func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
 		ItemSelector:  sql.NullString{String: item_selector, Valid: item_selector != ""},
 		TitleSelector: sql.NullString{String: title_selector, Valid: title_selector != ""},
 		LinkSelector:  sql.NullString{String: link_selector, Valid: link_selector != ""},
+		DateSelector:  sql.NullString{String: date_selector, Valid: date_selector != ""},
 	})
 
 	if err != nil {

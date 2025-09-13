@@ -14,13 +14,13 @@ GROUP BY f.id
 ORDER BY f.name;
 
 -- name: CreateFeed :one
-INSERT INTO feeds (name, url, item_selector, title_selector, link_selector, description_selector)
-VALUES (?, ?, ?, ?, ?, ?)
+INSERT INTO feeds (name, url, item_selector, title_selector, link_selector, description_selector, date_selector)
+VALUES (?, ?, ?, ?, ?, ?, ?)
 RETURNING *;
 
 -- name: UpdateFeed :exec
 UPDATE feeds
-SET name = ?, url = ?, item_selector = ?, title_selector = ?, link_selector = ?, description_selector = ?, updated_at = CURRENT_TIMESTAMP
+SET name = ?, url = ?, item_selector = ?, title_selector = ?, link_selector = ?, description_selector = ?, date_selector = ?, updated_at = CURRENT_TIMESTAMP
 WHERE id = ?;
 
 -- name: UpdateFeedLastRefreshedAt :exec
