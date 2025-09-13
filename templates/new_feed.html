@@ -40,9 +40,8 @@
                         <input
                             type="url" id="url" name="url" required
                             hx-post="/feed/preview"
-                            hx-target="#html-preview"
                             hx-trigger="keyup changed delay:200ms"
-                            hx-include="#url,#item_selector,#title_selector,#link_selector,#date_selector"
+                            hx-include="closest form"
                         >
                     </label>
 

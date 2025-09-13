@@ -34,29 +34,24 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse form data
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
 		return
 	}
 
 	url := r.FormValue("url")
-	// item_selector := r.FormValue("item_selector")
-	// title_selector := r.FormValue("title_selector")
-	// link_selector := r.FormValue("link_selector")
-
 	if url == "" {
 		http.Error(w, "URL is required", http.StatusBadRequest)
 		return
 	}
 
-	// fetch real html use http.Get
 	resp, err := http.Get(url)
 	if err != nil {
 		http.Error(w, "Failed to fetch URL", http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		http.Error(w, "Failed to fetch URL", http.StatusInternalServerError)
 		return
@@ -68,14 +63,17 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Escape HTML so it can be shown literally in <code>
-	escaped := html.EscapeString(string(bodyBytes))
+	// Escape the HTML so we can show it safely inside <code>
+	escapedBody := html.EscapeString(string(bodyBytes))
 
-	// Set content type to HTML
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	// Write escaped HTML to the <code> block
-	fmt.Fprint(w, escaped)
+	fmt.Fprintf(w, `<code id="html-preview" hx-swap-oob="true">%s</code>`, escapedBody)
+	fmt.Fprint(w, `
+<p id="selected-item-preview" hx-swap-oob="true"><em>Matched 5 items</em></p>
+<p id="selected-title-preview" hx-swap-oob="true"><em>First title: "Hello World"</em></p>
+<p id="selected-link-preview" hx-swap-oob="true"><em>Link found: https://example.com/post</em></p>
+<p id="selected-date-preview" hx-swap-oob="true"><em>Date parsed: 2025-09-13</em></p>`)
 }
 
 func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
