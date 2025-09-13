@@ -9,7 +9,7 @@ BINARY_NAME=web2rss
 BINARY_UNIX=$(BINARY_NAME)_unix
 DOCKER_IMAGE=web2rss:latest
 
-.PHONY: all build clean test coverage deps docker docker-run help dev lint migrate-up migrate-down sqlc-generate
+.PHONY: all build clean test coverage deps docker docker-run help dev lint migrate-up migrate-down sqlc-generate dump-schema
 
 all: deps test build ## Run deps, test and build
 
@@ -82,3 +82,6 @@ setup-db: migrate-up sqlc-generate ## Setup database (migrate + generate code)
 # Help
 help: ## Display this help screen
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+dump-schema: ## Dump current database schema to db/schema.sql
+	sqlite3 ./data/web2rss.sqlite3 ".schema" > ./db/schema.sql
