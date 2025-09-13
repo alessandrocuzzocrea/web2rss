@@ -75,39 +75,46 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 
 	// Collect preview items
 	type previewItem struct {
+		HTML  string
 		Title string
 		Link  string
 		Date  string
 	}
 
-	var previews []previewItem
+	// Find the first matched item
+	firstItem := doc.Find(itemSelector).First()
 
-	doc.Find(itemSelector).Each(func(i int, s *goquery.Selection) {
-		title := strings.TrimSpace(s.Find(titleSelector).Text())
-		link, exists := s.Find(linkSelector).Attr("href")
-		if !exists {
-			link = strings.TrimSpace(s.Find(linkSelector).Text())
+	title := strings.TrimSpace(firstItem.Find(titleSelector).Text())
+	link, exists := firstItem.Find(linkSelector).Attr("href")
+	if !exists {
+		link = strings.TrimSpace(firstItem.Find(linkSelector).Text())
+	}
+
+	var dateStr string
+	if dateSelector != "" {
+		dateStr = strings.TrimSpace(firstItem.Find(dateSelector).Text())
+		if idx := strings.Index(dateStr, " "); idx != -1 {
+			dateStr = dateStr[:idx]
 		}
+	}
 
-		var dateStr string
-		if dateSelector != "" {
-			dateStr = strings.TrimSpace(s.Find(dateSelector).Text())
-			if idx := strings.Index(dateStr, " "); idx != -1 {
-				dateStr = dateStr[:idx]
-			}
-		}
+	// Make link absolute if relative
+	if strings.HasPrefix(link, "/") {
+		link = resp.Request.URL.Scheme + "://" + resp.Request.URL.Host + link
+	}
 
-		// Make link absolute if relative
-		if strings.HasPrefix(link, "/") {
-			link = resp.Request.URL.Scheme + "://" + resp.Request.URL.Host + link
-		}
+	firstItemHtml, err := firstItem.Html()
+	if err != nil {
+		http.Error(w, "Failed to get item HTML", http.StatusInternalServerError)
+	}
 
-		previews = append(previews, previewItem{
-			Title: title,
-			Link:  link,
-			Date:  dateStr,
-		})
-	})
+	// Prepare a single preview
+	preview := previewItem{
+		HTML:  firstItemHtml,
+		Title: title,
+		Link:  link,
+		Date:  dateStr,
+	}
 
 	// Send OOB HTML updates
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -115,22 +122,12 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	// HTML preview (escaped)
 	fmt.Fprintf(w, `<code id="html-preview" hx-swap-oob="true">%s</code>`, html.EscapeString(string(bodyBytes)))
 
-	// Item previews
-	if len(previews) > 0 {
-		fmt.Fprintf(w, `<p id="selected-item-preview" hx-swap-oob="true"><em>Matched %d items</em></p>`, len(previews))
-		fmt.Fprintf(w, `<p id="selected-title-preview" hx-swap-oob="true"><em>First title: %q</em></p>`, previews[0].Title)
-		fmt.Fprintf(w, `<p id="selected-link-preview" hx-swap-oob="true"><em>Link found: %s</em></p>`, previews[0].Link)
-		fmt.Fprintf(w, `<p id="selected-date-preview" hx-swap-oob="true"><em>Date parsed: %s</em></p>`, previews[0].Date)
-	} else {
-		fmt.Fprint(w, `
-<p id="selected-item-preview" hx-swap-oob="true"><em>No items matched</em></p>
-<p id="selected-title-preview" hx-swap-oob="true"><em>No title</em></p>
-<p id="selected-link-preview" hx-swap-oob="true"><em>No link</em></p>
-<p id="selected-date-preview" hx-swap-oob="true"><em>No date</em></p>
-`)
-	}
+	// HTML preview for the first matched item (escaped)
+	fmt.Fprintf(w, `<code id="selected-item-preview" hx-swap-oob="true">%s</code>`, html.EscapeString(preview.HTML))
 
-	return
+	fmt.Fprintf(w, `<p id="selected-title-preview" hx-swap-oob="true"><em>First title: %q</em></p>`, preview.Title)
+	fmt.Fprintf(w, `<p id="selected-link-preview" hx-swap-oob="true"><em>Link found: %s</em></p>`, preview.Link)
+	fmt.Fprintf(w, `<p id="selected-date-preview" hx-swap-oob="true"><em>Date parsed: %s</em></p>`, preview.Date)
 }
 
 func (a *App) handleCreateFeed(w http.ResponseWriter, r *http.Request) {
