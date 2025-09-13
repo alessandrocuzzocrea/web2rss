@@ -1,0 +1,50 @@
+<div id="step-2">
+
+    {{/* copy selectors from existing, from a dropdown */}}
+    <select name="existing_selector_id"
+        hx-post="/feed/preview"
+        hx-target="#step-2"
+        hx-swap="innerHTML"
+        hx-indicator="#loader"
+        hx-trigger="change">
+      <option value="">-- Select Existing Selectors --</option>
+      {{range .ExistingSelectors}}
+      <option value="{{.ID}}">{{.ID}} ({{.Name}})</option>
+      {{end}}
+    </select>
+
+    <label for="item_selector">Item Selector
+        <input type="text" id="item_selector" name="item_selector" value="{{.ItemSelector}}"
+               hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
+    </label>
+
+    <label for="title_selector">Title Selector
+        <input type="text" id="title_selector" name="title_selector" value="{{.TitleSelector}}"
+               hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
+    </label>
+
+    <label for="link_selector">Link Selector
+        <input type="text" id="link_selector" name="link_selector" value="{{.LinkSelector}}"
+               hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
+    </label>
+
+    <label for="date_selector">Date Selector (optional)
+        <input type="text" id="date_selector" name="date_selector" value="{{.DateSelector}}"
+               hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
+    </label>
+
+    <button type="submit">Create Feed</button>
+    <a href="/" role="button" class="secondary">Cancel</a>
+
+    <h4>Preview</h4>
+    <p><strong>First item HTML:</strong></p>
+    <pre style="max-height:200px; overflow:auto;"><code>{{.FirstHTML}}</code></pre>
+
+    <p><strong>Title:</strong> {{.FirstTitle}}</p>
+    <p><strong>Link:</strong> {{.FirstLink}}</p>
+    <p><strong>Date:</strong> {{.FirstDate}}</p>
+</div>

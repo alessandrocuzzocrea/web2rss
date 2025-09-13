@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"html"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -53,6 +53,27 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	titleSelector := r.FormValue("title_selector")
 	linkSelector := r.FormValue("link_selector")
 	dateSelector := r.FormValue("date_selector")
+
+	existingSelectorIDStr := r.FormValue("existing_selector_id")
+
+	if existingSelectorIDStr != "" {
+		existingSelectorID, err := strconv.ParseInt(existingSelectorIDStr, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid existing selectors ID", http.StatusBadRequest)
+			return
+		}
+
+		template_feed, err := a.queries.GetFeed(r.Context(), existingSelectorID)
+		if err != nil {
+			http.Error(w, "Failed to load existing selectors", http.StatusInternalServerError)
+			return
+		}
+
+		itemSelector = nullStringToString(template_feed.ItemSelector)
+		titleSelector = nullStringToString(template_feed.TitleSelector)
+		linkSelector = nullStringToString(template_feed.LinkSelector)
+		dateSelector = nullStringToString(template_feed.DateSelector)
+	}
 
 	// Fetch URL
 	resp, err := http.Get(url)
@@ -105,53 +126,68 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 
 	// Render Step 2 HTML
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, err = fmt.Fprintf(w, `
-<div id="step-2">
-    <label for="item_selector">Item Selector
-        <input type="text" id="item_selector" name="item_selector" value="%s"
-               hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
-    </label>
 
-    <label for="title_selector">Title Selector
-        <input type="text" id="title_selector" name="title_selector" value="%s"
-		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
+	// prepare existing selectors to be used in the template
+	type Selector struct {
+		ID            string
+		Name          string
+		ItemSelector  string
+		TitleSelector string
+		LinkSelector  string
+		DateSelector  string
+		Url           string
+	}
 
-    </label>
+	type PageData struct {
+		ExistingSelectors []Selector
+		// any other fields, e.g. for preview
+		ItemSelector  string
+		TitleSelector string
+		LinkSelector  string
+		DateSelector  string
+		FirstHTML     string
+		FirstTitle    string
+		FirstLink     string
+		FirstDate     string
+	}
 
-    <label for="link_selector">Link Selector
-        <input type="text" id="link_selector" name="link_selector" value="%s"
-		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
-
-    </label>
-
-    <label for="date_selector">Date Selector (optional)
-        <input type="text" id="date_selector" name="date_selector" value="%s"
-		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
-               hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
-
-    </label>
-
-    <button type="submit">Create Feed</button>
-    <a href="/" role="button" class="secondary">Cancel</a>
-
-    <h4>Preview</h4>
-    <p><strong>First item HTML:</strong></p>
-    <pre style="max-height:200px; overflow:auto;"><code>%s</code></pre>
-
-    <p><strong>Title:</strong> %s</p>
-    <p><strong>Link:</strong> %s</p>
-    <p><strong>Date:</strong> %s</p>
-</div>
-`, html.EscapeString(itemSelector), html.EscapeString(titleSelector),
-		html.EscapeString(linkSelector), html.EscapeString(dateSelector),
-		html.EscapeString(firstHTML), html.EscapeString(firstTitle),
-		html.EscapeString(firstLink), html.EscapeString(firstDate))
-
+	ExistingSelectors, err := a.queries.ListFeeds(r.Context())
 	if err != nil {
-		_ = fmt.Errorf("failed to write response: %w", err)
+		log.Printf("Failed to list feeds: %v", err)
+		http.Error(w, "Failed to load feeds", http.StatusInternalServerError)
+		return
+	}
+
+	// convert to []Selector
+	var selectors []Selector
+	for _, s := range ExistingSelectors {
+		selectors = append(selectors, Selector{
+			ID:            strconv.FormatInt(s.ID, 10),
+			Name:          s.Name,
+			ItemSelector:  nullStringToString(s.ItemSelector),
+			TitleSelector: nullStringToString(s.TitleSelector),
+			LinkSelector:  nullStringToString(s.LinkSelector),
+			DateSelector:  nullStringToString(s.DateSelector),
+		})
+	}
+
+	data := PageData{
+		ExistingSelectors: selectors,
+		ItemSelector:      itemSelector,
+		TitleSelector:     titleSelector,
+		LinkSelector:      linkSelector,
+		DateSelector:      dateSelector,
+		FirstHTML:         firstHTML,
+		FirstTitle:        firstTitle,
+		FirstLink:         firstLink,
+		FirstDate:         firstDate,
+	}
+
+	// lets use feed-selector-partial.html
+	if err := a.templates.ExecuteTemplate(w, "feed-selector-partial.html", data); err != nil {
+		// print the err
+		fmt.Printf("Template error: %v\n", err)
+		http.Error(w, "Template error", http.StatusInternalServerError)
 		return
 	}
 }
