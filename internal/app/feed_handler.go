@@ -127,7 +127,7 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	// Render Step 2 HTML
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	//prepare existing selectors to be used in the template
+	// prepare existing selectors to be used in the template
 	type Selector struct {
 		ID            string
 		Name          string
@@ -158,7 +158,7 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//convert to []Selector
+	// convert to []Selector
 	var selectors []Selector
 	for _, s := range ExistingSelectors {
 		selectors = append(selectors, Selector{
@@ -183,7 +183,7 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 		FirstDate:         firstDate,
 	}
 
-	//lets use feed-selector-partial.html
+	// lets use feed-selector-partial.html
 	if err := a.templates.ExecuteTemplate(w, "feed-selector-partial.html", data); err != nil {
 		// print the err
 		fmt.Printf("Template error: %v\n", err)
