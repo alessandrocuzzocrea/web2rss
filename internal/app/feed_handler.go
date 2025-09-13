@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -104,17 +105,64 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 
 	// Render Step 2 HTML
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	//prepare existing selectors to be used in the template
+	type Selector struct {
+		Name          string
+		ItemSelector  string
+		TitleSelector string
+		LinkSelector  string
+		DateSelector  string
+		Url           string
+	}
+
+	type PageData struct {
+		ExistingSelectors []Selector
+		// any other fields, e.g. for preview
+		ItemSelector  string
+		TitleSelector string
+		LinkSelector  string
+		DateSelector  string
+		FirstHTML     string
+		FirstTitle    string
+		FirstLink     string
+		FirstDate     string
+	}
+
+	ExistingSelectors, err := a.queries.ListFeeds(r.Context())
+	if err != nil {
+		log.Printf("Failed to list feeds: %v", err)
+		http.Error(w, "Failed to load feeds", http.StatusInternalServerError)
+		return
+	}
+
+	//convert to []Selector
+	var selectors []Selector
+	for _, s := range ExistingSelectors {
+		selectors = append(selectors, Selector{
+			Name:          s.Name,
+			ItemSelector:  nullStringToString(s.ItemSelector),
+			TitleSelector: nullStringToString(s.TitleSelector),
+			LinkSelector:  nullStringToString(s.LinkSelector),
+			DateSelector:  nullStringToString(s.DateSelector),
+			Url:           s.Url,
+		})
+	}
+
+	data := PageData{
+		ExistingSelectors: selectors,
+		ItemSelector:      itemSelector,
+		TitleSelector:     titleSelector,
+		LinkSelector:      linkSelector,
+		DateSelector:      dateSelector,
+		FirstHTML:         firstHTML,
+		FirstTitle:        firstTitle,
+		FirstLink:         firstLink,
+		FirstDate:         firstDate,
+	}
+
 	//lets use feed-selector-partial.html
-	if err := a.templates.ExecuteTemplate(w, "feed-selector-partial.html", map[string]string{
-		"itemSelector":  itemSelector,
-		"titleSelector": titleSelector,
-		"linkSelector":  linkSelector,
-		"dateSelector":  dateSelector,
-		"firstHTML":     firstHTML,
-		"firstTitle":    firstTitle,
-		"firstLink":     firstLink,
-		"firstDate":     firstDate,
-	}); err != nil {
+	if err := a.templates.ExecuteTemplate(w, "feed-selector-partial.html", data); err != nil {
 		// print the err
 		fmt.Printf("Template error: %v\n", err)
 		http.Error(w, "Template error", http.StatusInternalServerError)

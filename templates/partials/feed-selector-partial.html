@@ -1,29 +1,53 @@
 <div id="step-2">
+
+    {{/* copy selectors from existing, from a dropdown */}}
+    <select id="existing_selectors" name="existing_selectors"
+            hx-post="/feed/preview"
+            hx-trigger="change"
+            hx-target="#step-2"
+            hx-swap="innerHTML"
+            hx-include="closest form"
+            hx-indicator="#loader"
+            hx-vals='{
+                "item_selector": document.querySelector("#existing_selectors option:checked")?.dataset.item || "",
+                "title_selector": document.querySelector("#existing_selectors option:checked")?.dataset.title || "",
+                "link_selector": document.querySelector("#existing_selectors option:checked")?.dataset.link || "",
+                "date_selector": document.querySelector("#existing_selectors option:checked")?.dataset.date || ""
+            }'>
+        <option value="">-- Select Existing Selectors --</option>
+        {{range .ExistingSelectors}}
+        <option value="{{.Name}}"
+                data-item="{{.ItemSelector}}"
+                data-title="{{.TitleSelector}}"
+                data-link="{{.LinkSelector}}"
+                data-date="{{.DateSelector}}">
+            {{.Name}} ({{.Url}})
+        </option>
+        {{end}}
+    </select>
+
     <label for="item_selector">Item Selector
-        <input type="text" id="item_selector" name="item_selector" value="{{.itemSelector}}"
+        <input type="text" id="item_selector" name="item_selector" value="{{.ItemSelector}}"
                hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
                hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
     </label>
 
     <label for="title_selector">Title Selector
-        <input type="text" id="title_selector" name="title_selector" value="{{.titleSelector}}"
-		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+        <input type="text" id="title_selector" name="title_selector" value="{{.TitleSelector}}"
+               hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
                hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
-
     </label>
 
     <label for="link_selector">Link Selector
-        <input type="text" id="link_selector" name="link_selector" value="{{.linkSelector}}"
-		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+        <input type="text" id="link_selector" name="link_selector" value="{{.LinkSelector}}"
+               hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
                hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
-
     </label>
 
     <label for="date_selector">Date Selector (optional)
-        <input type="text" id="date_selector" name="date_selector" value="{{.dateSelector}}"
-		       hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
+        <input type="text" id="date_selector" name="date_selector" value="{{.DateSelector}}"
+               hx-post="/feed/preview" hx-trigger="keyup change delay:200ms"
                hx-target="#step-2" hx-swap="innerHTML" hx-include="closest form" hx-indicator="#loader">
-
     </label>
 
     <button type="submit">Create Feed</button>
@@ -31,9 +55,9 @@
 
     <h4>Preview</h4>
     <p><strong>First item HTML:</strong></p>
-    <pre style="max-height:200px; overflow:auto;"><code>{{.firstHTML}}</code></pre>
+    <pre style="max-height:200px; overflow:auto;"><code>{{.FirstHTML}}</code></pre>
 
-    <p><strong>Title:</strong>{{.firstTitle}}</p>
-    <p><strong>Link:</strong>{{.firstLink}}</p>
-    <p><strong>Date:</strong>{{.firstDate}}</p>
+    <p><strong>Title:</strong> {{.FirstTitle}}</p>
+    <p><strong>Link:</strong> {{.FirstLink}}</p>
+    <p><strong>Date:</strong> {{.FirstDate}}</p>
 </div>
