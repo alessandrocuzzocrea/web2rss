@@ -39,7 +39,7 @@ func TestHandlePreviewFeed(t *testing.T) {
 
 	app := &App{
 		queries: mockQ,
-		config: &Config{Timezone: "UTC"},
+		config:  &Config{Timezone: "UTC"},
 	}
 
 	// Load templates
@@ -78,7 +78,7 @@ func TestHandlePreviewFeedInvalidURL(t *testing.T) {
 	}
 	app := &App{
 		queries: mockQ,
-		config: &Config{Timezone: "UTC"},
+		config:  &Config{Timezone: "UTC"},
 	}
 
 	form := url.Values{}
@@ -111,7 +111,7 @@ func TestHandleDuplicateFeed(t *testing.T) {
 
 	app := &App{
 		queries: mockQ,
-		config: &Config{Timezone: "UTC"},
+		config:  &Config{Timezone: "UTC"},
 	}
 
 	// Load templates

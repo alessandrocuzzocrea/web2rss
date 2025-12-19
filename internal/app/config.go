@@ -6,8 +6,8 @@ import (
 
 // Config holds the application configuration
 type Config struct {
-	Port    string
-	DBPath  string
+	Port     string
+	DBPath   string
 	DataDir  string
 	Timezone string
 }

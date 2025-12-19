@@ -26,6 +26,5 @@ func NewTemplateFuncs(cfg *Config) template.FuncMap {
 			// Format: YYYY-MM-DD HH:MM:SS MST
 			return localTime.Format("2006-01-02 15:04:05 MST")
 		},
-
 	}
 }
