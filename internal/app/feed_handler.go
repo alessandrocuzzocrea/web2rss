@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -43,8 +44,8 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url := r.FormValue("url")
-	if url == "" {
+	feedURL := r.FormValue("url")
+	if feedURL == "" {
 		http.Error(w, "URL required", http.StatusBadRequest)
 		return
 	}
@@ -76,10 +77,15 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch URL
-	resp, err := http.Get(url)
-	if err != nil || resp.StatusCode != http.StatusOK {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = fmt.Errorf("failed to fetch URL: %w", err)
+	resp, err := http.Get(feedURL)
+	if err != nil {
+		log.Printf("failed to fetch URL %s: %v", feedURL, err)
+		http.Error(w, fmt.Sprintf("failed to fetch URL: %v", err), http.StatusBadRequest)
+		return
+	}
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("failed to fetch URL %s: status %d", feedURL, resp.StatusCode)
+		http.Error(w, fmt.Sprintf("failed to fetch URL: status %d", resp.StatusCode), http.StatusBadRequest)
 		return
 	}
 	defer func() {
@@ -89,15 +95,15 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_ = fmt.Errorf("failed to read URL: %w", err)
+		log.Printf("failed to read URL body: %v", err)
+		http.Error(w, "failed to read response body", http.StatusInternalServerError)
 		return
 	}
 
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(bodyBytes))
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_ = fmt.Errorf("failed to parse HTML: %w", err)
+		log.Printf("failed to parse HTML: %v", err)
+		http.Error(w, "failed to parse HTML", http.StatusInternalServerError)
 		return
 	}
 
@@ -118,8 +124,14 @@ func (a *App) handlePreviewFeed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Absolute link if needed
-	if strings.HasPrefix(firstLink, "/") {
-		firstLink = resp.Request.URL.Scheme + "://" + resp.Request.URL.Host + firstLink
+	if firstLink != "" {
+		base, err := url.Parse(feedURL)
+		if err == nil {
+			rel, err := url.Parse(firstLink)
+			if err == nil {
+				firstLink = base.ResolveReference(rel).String()
+			}
+		}
 	}
 
 	firstHTML, _ := first.Html()
