@@ -14,6 +14,11 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+var (
+	// CommitHash is the git commit hash at build time
+	CommitHash = "unknown"
+)
+
 const (
 	dataDirPerm = 0755
 )

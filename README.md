@@ -45,6 +45,18 @@ go build ./cmd/web2rss
 ./web2rss
 ```
 
+## Linting and Testing
+
+To run the automated tests:
+```bash
+make test
+```
+
+To run the linter (matches CI configuration):
+```bash
+make lint
+```
+
 ## Database Migrations
 
 To create a new migration:
