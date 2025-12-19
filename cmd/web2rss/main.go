@@ -1,25 +1,37 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/alessandrocuzzocrea/web2rss/internal/app"
 )
 
 func main() {
+	if err := run(); err != nil {
+		log.Fatalf("web2rss failed: %v", err)
+	}
+}
+
+func run() error {
 	log.Printf("Starting web2rss...")
 
 	cfg := app.LoadConfig()
 
-	app, err := app.New(cfg)
+	application, err := app.New(cfg)
 	if err != nil {
-		log.Fatalf("Failed to initialize application: %v", err)
+		return fmt.Errorf("failed to initialize application: %w", err)
 	}
-	defer app.Close()
+	defer func() {
+		if err := application.Close(); err != nil {
+			log.Printf("Failed to close application: %v", err)
+		}
+	}()
 
-	if err = app.Run(); err != nil {
-		log.Fatalf("Application failed: %v", err)
+	if err = application.Run(); err != nil {
+		return fmt.Errorf("application failed: %w", err)
 	}
 
 	log.Println("web2rss application completed successfully")
+	return nil
 }

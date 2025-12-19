@@ -49,14 +49,14 @@ func New(cfg *Config) (*App, error) {
 
 	for _, p := range pragmas {
 		if _, err := database.Exec(p); err != nil {
-			database.Close()
+			_ = database.Close()
 			return nil, fmt.Errorf("failed to set %s: %w", p, err)
 		}
 	}
 
 	// Test database connection
 	if err := database.Ping(); err != nil {
-		database.Close()
+		_ = database.Close()
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
@@ -73,7 +73,7 @@ func New(cfg *Config) (*App, error) {
 	for _, dir := range dirs {
 		_, err := templates.ParseGlob(dir)
 		if err != nil {
-			database.Close()
+			_ = database.Close()
 			return nil, fmt.Errorf("failed to parse templates in %s: %w", dir, err)
 		}
 	}

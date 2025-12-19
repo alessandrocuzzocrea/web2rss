@@ -6,9 +6,9 @@ import (
 
 // Config holds the application configuration
 type Config struct {
-	Port     string
-	DBPath   string
-	DataDir  string
+	Port    string
+	DBPath  string
+	DataDir string
 }
 
 // LoadConfig loads the configuration from environment variables
