@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,53 +10,62 @@
     <title>{{.Name}} - web2rss</title>
     <meta name="description" content="Convert websites to RSS feeds">
 </head>
+
 <body>
-<header class="container">
-    <nav>
-        <ul>
-            <li><strong>🌐 web2rss</strong></li>
-        </ul>
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/feeds">Feeds</a></li>
-            <li><a href="/health">Health</a></li>
-        </ul>
-    </nav>
-</header>
+    <header class="container">
+        <nav>
+            <ul>
+                <li><strong>🌐 web2rss</strong></li>
+            </ul>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/feeds">Feeds</a></li>
+                <li><a href="/health">Health</a></li>
+            </ul>
+        </nav>
+    </header>
 
-<main class="container">
-    <section>
-        <h2>New Feed</h2>
-        <div id="loader" class="htmx-indicator">⏳ Fetching preview...</div>
+    <main class="container">
+        <section>
+            <h2>New Feed</h2>
+            <div id="loader" class="htmx-indicator">⏳ Fetching preview...</div>
 
 
-        <div id="form-container">
-            <form action="/feed/new" method="post">
-                <!-- Step 1: URL input -->
-                <div id="step-1">
-                    <label for="name">
-                        Feed Name
-                        <input type="text" id="name" name="name" required>
-                    </label>
+            <div id="form-container">
+                <form action="/feed/new" method="post">
+                    <!-- Step 1: URL input -->
+                    <div id="step-1">
+                        <label for="name">
+                            Feed Name
+                            <input type="text" id="name" name="name" value="{{if .Name}}{{.Name}}{{end}}" required>
+                        </label>
 
-                    <label for="url">
-                        Website URL
-                        <input type="url" id="url" name="url" required
-                               hx-post="/feed/preview"
-                               hx-trigger="change delay:500ms"
-                               hx-target="#step-2"
-                               hx-swap="innerHTML"
-                               hx-indicator="#loader">
-                    </label>
-                </div>
+                        <label for="url">
+                            Website URL
+                            <input type="url" id="url" name="url" value="{{if .Url}}{{.Url}}{{end}}" required
+                                hx-post="/feed/preview" hx-trigger="change delay:500ms{{if .Url}}, load{{end}}"
+                                hx-target="#step-2" hx-swap="innerHTML" hx-indicator="#loader"
+                                hx-include="#hidden-selectors">
+                        </label>
+                    </div>
 
-                <!-- Step 2: This will be injected by the server if the URL is valid -->
-                <div id="step-2">
-                    <!-- Initially empty -->
-                </div>
-            </form>
-        </div>
-    </section>
-</main>
+                    {{if .Url}}
+                    <div id="hidden-selectors" style="display:none;">
+                        <input type="hidden" name="item_selector" value="{{.ItemSelector}}">
+                        <input type="hidden" name="title_selector" value="{{.TitleSelector}}">
+                        <input type="hidden" name="link_selector" value="{{.LinkSelector}}">
+                        <input type="hidden" name="date_selector" value="{{.DateSelector}}">
+                    </div>
+                    {{end}}
+
+                    <!-- Step 2: This will be injected by the server if the URL is valid -->
+                    <div id="step-2">
+                        <!-- Initially empty -->
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
 </body>
+
 </html>

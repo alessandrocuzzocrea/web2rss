@@ -20,6 +20,7 @@ func (a *App) Routes() *http.ServeMux {
 
 	// Feed creation
 	mux.HandleFunc("GET /feed/new", a.handleNewFeed)
+	mux.HandleFunc("GET /feed/{id}/duplicate", a.handleDuplicateFeed)
 	mux.HandleFunc("POST /feed/preview", a.handlePreviewFeed)
 
 	// Create feed
