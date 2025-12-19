@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	_ "time/tzdata"
 
 	"github.com/alessandrocuzzocrea/web2rss/internal/app"
 )

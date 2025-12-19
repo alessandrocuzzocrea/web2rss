@@ -84,7 +84,7 @@ func New(cfg *Config) (*App, error) {
 
 	queries := db.New(database)
 
-	templates := template.New("")
+	templates := template.New("").Funcs(NewTemplateFuncs(cfg))
 
 	dirs := []string{
 		"templates/*.html",

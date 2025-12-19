@@ -36,9 +36,10 @@ func TestIntegration(t *testing.T) {
 	assert.NoError(t, err)
 
 	cfg := &Config{
-		Port:    "8080",
-		DBPath:  dbPath,
-		DataDir: tmpDir,
+		Port:     "8080",
+		DBPath:   dbPath,
+		DataDir:  tmpDir,
+		Timezone: "UTC",
 	}
 
 	app := &App{
@@ -48,7 +49,7 @@ func TestIntegration(t *testing.T) {
 	}
 
 	// Load templates
-	tmpl := template.New("")
+	tmpl := template.New("").Funcs(NewTemplateFuncs(cfg))
 	_, err = tmpl.ParseGlob("../../templates/*.html")
 	assert.NoError(t, err)
 	_, err = tmpl.ParseGlob("../../templates/partials/*.html")
