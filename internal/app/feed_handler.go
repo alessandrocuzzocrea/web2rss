@@ -21,10 +21,54 @@ func (a *App) handleNewFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	a.renderNewFeed(w, nil)
+}
+
+func (a *App) handleDuplicateFeed(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	idStr := r.PathValue("id")
+	feedID, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid feed ID", http.StatusBadRequest)
+		return
+	}
+
+	feed, err := a.queries.GetFeed(r.Context(), feedID)
+	if err != nil {
+		http.Error(w, "Feed not found", http.StatusNotFound)
+		return
+	}
+
+	data := struct {
+		ID            int64
+		Name          string
+		Url           string
+		ItemSelector  string
+		TitleSelector string
+		LinkSelector  string
+		DateSelector  string
+	}{
+		ID:            feed.ID,
+		Name:          feed.Name + " (copy)",
+		Url:           feed.Url,
+		ItemSelector:  nullStringToString(feed.ItemSelector),
+		TitleSelector: nullStringToString(feed.TitleSelector),
+		LinkSelector:  nullStringToString(feed.LinkSelector),
+		DateSelector:  nullStringToString(feed.DateSelector),
+	}
+
+	a.renderNewFeed(w, data)
+}
+
+func (a *App) renderNewFeed(w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	// Execute the template
-	if err := a.templates.ExecuteTemplate(w, "new_feed.html", nil); err != nil {
+	if err := a.templates.ExecuteTemplate(w, "new_feed.html", data); err != nil {
 		// print the err
 		fmt.Printf("Template error: %v\n", err)
 		http.Error(w, "Template error", http.StatusInternalServerError)

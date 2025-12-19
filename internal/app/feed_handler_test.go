@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -90,4 +91,45 @@ func TestHandlePreviewFeedInvalidURL(t *testing.T) {
 
 	// Check the response - should be bad request or internal error depending on implementation
 	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestHandleDuplicateFeed(t *testing.T) {
+	mockQ := &mockQueries{
+		GetFeedFn: func(ctx context.Context, id int64) (db.Feed, error) {
+			return db.Feed{
+				ID:            1,
+				Name:          "Test Feed",
+				Url:           "http://test.com",
+				ItemSelector:  sql.NullString{String: ".item", Valid: true},
+				TitleSelector: sql.NullString{String: ".title", Valid: true},
+				LinkSelector:  sql.NullString{String: ".link", Valid: true},
+			}, nil
+		},
+	}
+
+	app := &App{
+		queries: mockQ,
+	}
+
+	// Load templates
+	tmpl := template.New("")
+	_, err := tmpl.ParseGlob("../../templates/*.html")
+	assert.NoError(t, err)
+	_, err = tmpl.ParseGlob("../../templates/partials/*.html")
+	assert.NoError(t, err)
+	app.templates = tmpl
+
+	req := httptest.NewRequest("GET", "/feed/1/duplicate", nil)
+	req.SetPathValue("id", "1")
+	w := httptest.NewRecorder()
+
+	app.handleDuplicateFeed(w, req)
+
+	// Check the response
+	assert.Equal(t, http.StatusOK, w.Code)
+	body := w.Body.String()
+	assert.Contains(t, body, "Test Feed (copy)")
+	assert.Contains(t, body, "http://test.com")
+	assert.Contains(t, body, "hx-trigger=\"change delay:500ms, load\"")
+	assert.Contains(t, body, "name=\"item_selector\" value=\".item\"")
 }
