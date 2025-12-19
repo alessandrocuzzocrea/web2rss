@@ -180,7 +180,7 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 	// Update the feed's last_refreshed_at timestamp
 	if err := a.queries.UpdateFeedLastRefreshedAt(ctx, db.UpdateFeedLastRefreshedAtParams{
 		ID:              feed.ID,
-		LastRefreshedAt: db.NewNullTime(time.Now()),
+		LastRefreshedAt: db.NewNullTime(time.Now().UTC()),
 	}); err != nil {
 		log.Printf("Failed to update last_refreshed_at for feed %d: %v", feed.ID, err)
 	}
