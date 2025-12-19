@@ -221,8 +221,10 @@
                 <strong>{{.Name}}</strong><br>
                 <small><a href="{{.Url}}" target="_blank">{{.Url}}</a></small>
               </td>
-              <td><small>{{.CreatedAt | formatDate}}</small></td>
-              <td><small>{{.LastRefreshedAt | formatDate}}</small></td>
+              <td><small><span class="local-date" data-timestamp="{{.CreatedAt | isoDate}}">{{.CreatedAt |
+                    formatDate}}</span></small></td>
+              <td><small><span class="local-date" data-timestamp="{{.LastRefreshedAt | isoDate}}">{{.LastRefreshedAt |
+                    formatDate}}</span></small></td>
               <td>{{.ItemsCount}}</td>
               <td>
                 <div style="display: flex; gap: 0.25rem; align-items: center;">
@@ -286,6 +288,26 @@
           menu.removeAttribute('open');
         }
       });
+    });
+
+    // Localize dates
+    document.querySelectorAll('.local-date').forEach(el => {
+      const iso = el.getAttribute('data-timestamp');
+      if (!iso) return;
+      const date = new Date(iso);
+      if (isNaN(date.getTime())) return;
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+
+      // Get timezone name (e.g. JST, EST) if possible, or offset
+      const timeZoneName = /\((.*)\)/.exec(date.toString())?.[1] || '';
+
+      el.textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds} ${timeZoneName}`;
     });
   </script>
 </body>
