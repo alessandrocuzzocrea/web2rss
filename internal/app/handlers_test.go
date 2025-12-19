@@ -39,7 +39,7 @@ func (m *mockQueries) ListFeedItems(ctx context.Context, feedID int64) ([]db.Fee
 func TestFormatRSSDate(t *testing.T) {
 	// Test with a valid time
 	testTime := time.Date(2023, 12, 25, 10, 30, 0, 0, time.UTC)
-	expected := "25 Dec 23 10:30 UTC"
+	expected := "Mon, 25 Dec 2023 10:30:00 +0000"
 	result := formatRSSDate(testTime)
 	assert.Equal(t, expected, result)
 
@@ -56,7 +56,7 @@ func TestRSSGeneration(t *testing.T) {
 			Title:       "Test Item 1",
 			Link:        "https://example.com/item1",
 			Description: "This is a test item",
-			PubDate:     "25 Dec 23 10:30 UTC",
+			PubDate:     "Mon, 25 Dec 2023 10:30:00 +0000",
 		},
 	}
 
@@ -68,7 +68,7 @@ func TestRSSGeneration(t *testing.T) {
 			Link:        "https://example.com",
 			Description: "RSS feed generated from https://example.com",
 			Language:    "en-us",
-			PubDate:     "25 Dec 23 10:30 UTC",
+			PubDate:     "Mon, 25 Dec 2023 10:30:00 +0000",
 			Items:       items,
 		},
 	}
@@ -87,7 +87,7 @@ func TestRSSGeneration(t *testing.T) {
 	assert.Contains(t, xmlStr, "<title>Test Item 1</title>")
 	assert.Contains(t, xmlStr, "<link>https://example.com/item1</link>")
 	assert.Contains(t, xmlStr, "<description>This is a test item</description>")
-	assert.Contains(t, xmlStr, "<pubDate>25 Dec 23 10:30 UTC</pubDate>")
+	assert.Contains(t, xmlStr, "<pubDate>Mon, 25 Dec 2023 10:30:00 +0000</pubDate>")
 
 	// Verify it's valid XML by unmarshaling it back
 	var parsedRSS RSS
@@ -104,7 +104,7 @@ func TestRSSGeneration(t *testing.T) {
 	assert.Equal(t, "Test Item 1", parsedRSS.Channel.Items[0].Title)
 	assert.Equal(t, "https://example.com/item1", parsedRSS.Channel.Items[0].Link)
 	assert.Equal(t, "This is a test item", parsedRSS.Channel.Items[0].Description)
-	assert.Equal(t, "25 Dec 23 10:30 UTC", parsedRSS.Channel.Items[0].PubDate)
+	assert.Equal(t, "Mon, 25 Dec 2023 10:30:00 +0000", parsedRSS.Channel.Items[0].PubDate)
 }
 
 func TestHandleFeedRSS(t *testing.T) {

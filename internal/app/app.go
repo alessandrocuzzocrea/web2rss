@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"html/template"
@@ -24,23 +23,42 @@ type App struct {
 	queries   *db.Queries
 	templates *template.Template
 	startTime time.Time
+	config    *Config
 }
 
 // New creates a new instance of the application
-func New() (*App, error) {
+func New(cfg *Config) (*App, error) {
 	// Create data directory if it doesn't exist
-	if err := os.MkdirAll("./data", dataDirPerm); err != nil {
+	if err := os.MkdirAll(cfg.DataDir, dataDirPerm); err != nil {
 		return nil, fmt.Errorf("failed to create data directory: %w", err)
 	}
 
-	database, err := sql.Open("sqlite", "./data/web2rss.sqlite3")
+	database, err := sql.Open("sqlite", cfg.DBPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
-	// Optional: set pool settings
-	// database.SetMaxOpenConns(10)
-	// database.SetMaxIdleConns(5)
+	pragmas := []string{
+		"PRAGMA journal_mode = WAL;",
+		"PRAGMA foreign_keys = ON;",
+		"PRAGMA synchronous = FULL;",
+		"PRAGMA temp_store = MEMORY;",
+		"PRAGMA busy_timeout = 5000;",
+		"PRAGMA strict = ON;",
+	}
+
+	for _, p := range pragmas {
+		if _, err := database.Exec(p); err != nil {
+			database.Close()
+			return nil, fmt.Errorf("failed to set %s: %w", p, err)
+		}
+	}
+
+	// Test database connection
+	if err := database.Ping(); err != nil {
+		database.Close()
+		return nil, fmt.Errorf("failed to ping database: %w", err)
+	}
 
 	queries := db.New(database)
 
@@ -55,6 +73,7 @@ func New() (*App, error) {
 	for _, dir := range dirs {
 		_, err := templates.ParseGlob(dir)
 		if err != nil {
+			database.Close()
 			return nil, fmt.Errorf("failed to parse templates in %s: %w", dir, err)
 		}
 	}
@@ -64,6 +83,7 @@ func New() (*App, error) {
 		queries:   queries,
 		templates: templates,
 		startTime: time.Now(),
+		config:    cfg,
 	}
 
 	return app, nil
@@ -75,53 +95,14 @@ func (a *App) Close() error {
 
 // Run starts the application
 func (a *App) Run() error {
-	ctx := context.Background()
-
-	// Create data directory if it doesn't exist
-	if err := os.MkdirAll("./data", dataDirPerm); err != nil {
-		return fmt.Errorf("failed to create data directory: %w", err)
-	}
-
-	// Open database connection
-	db, err := sql.Open("sqlite", "./data/web2rss.sqlite3")
-	if err != nil {
-		return fmt.Errorf("failed to open database: %w", err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Printf("failed to close db: %v", err)
-		}
-	}()
-
-	pragmas := []string{
-		"PRAGMA journal_mode = WAL;",
-		"PRAGMA foreign_keys = ON;",
-		"PRAGMA synchronous = FULL;",
-		"PRAGMA temp_store = MEMORY;",
-		"PRAGMA busy_timeout = 5000;",
-		"PRAGMA strict = ON;",
-	}
-
-	for _, p := range pragmas {
-		if _, err := db.Exec(p); err != nil {
-			return fmt.Errorf("failed to set %s: %w", p, err)
-		}
-	}
-
-	// Test database connection
-	if err := db.PingContext(ctx); err != nil {
-		return fmt.Errorf("failed to ping database: %w", err)
-	}
-
 	log.Println("Database connection established")
 
 	a.StartFeedScheduler()
 
 	mux := a.Routes()
-	// host := "localhost"
-	port := "8080"
+	port := a.config.Port
 
-	log.Println("Server starting on :8080")
+	log.Printf("Server starting on :%s\n", port)
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%s", port), mux); err != nil {
 		return fmt.Errorf("HTTP server failed: %w", err)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -151,9 +152,11 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 		// }
 
 		// Make link absolute if it's relative
-		if strings.HasPrefix(link, "/") {
-			baseURL := resp.Request.URL.Scheme + "://" + resp.Request.URL.Host
-			link = baseURL + link
+		if link != "" {
+			parsedLink, err := url.Parse(link)
+			if err == nil {
+				link = resp.Request.URL.ResolveReference(parsedLink).String()
+			}
 		}
 
 		// Upsert the item (will update if exists, insert if new)
@@ -167,12 +170,12 @@ func (a *App) refreshFeed(ctx context.Context, feed db.Feed) error {
 
 		if err != nil {
 			log.Printf("Failed to upsert feed item: %v", err)
-		} else {
+		} else if len(count) > 0 {
 			newItemsCount++
 		}
 	})
 
-	log.Printf("Feed %d: processed %d items. Upserted %d new items.", feed.ID, newItemsCount, len(count))
+	log.Printf("Feed %d: processed items. Updated %d new items.", feed.ID, newItemsCount)
 
 	// Update the feed's last_refreshed_at timestamp
 	if err := a.queries.UpdateFeedLastRefreshedAt(ctx, db.UpdateFeedLastRefreshedAtParams{
