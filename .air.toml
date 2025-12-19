@@ -4,8 +4,8 @@ tmp_dir = "tmp"
 
 [build]
 args_bin = []
-bin = "./tmp/main"
-cmd = 'go build -ldflags "-X github.com/alessandrocuzzocrea/web2rss/internal/app.CommitHash=e350bc6" -o ./tmp/main ./cmd/web2rss'
+bin = "./tmp/main.exe"
+cmd = 'go build -ldflags "-X github.com/alessandrocuzzocrea/web2rss/internal/app.CommitHash=e350bc6" -o ./tmp/main.exe ./cmd/web2rss'
 delay = 1000
 exclude_dir = [
   "assets",
