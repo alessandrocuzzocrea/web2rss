@@ -19,7 +19,7 @@ func TestIntegration(t *testing.T) {
 	// Create a temporary directory for the test
 	tmpDir, err := os.MkdirTemp("", "web2rss-test-*")
 	assert.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	dbPath := tmpDir + "/test.sqlite3"
 
@@ -67,7 +67,7 @@ func TestIntegration(t *testing.T) {
 				</body>
 			</html>
 		`
-		fmt.Fprint(w, html)
+		_, _ = fmt.Fprint(w, html)
 	}))
 	defer ts.Close()
 

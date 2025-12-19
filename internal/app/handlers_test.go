@@ -15,8 +15,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
-
 func TestFormatRSSDate(t *testing.T) {
 	// Test with a valid time
 	testTime := time.Date(2023, 12, 25, 10, 30, 0, 0, time.UTC)
@@ -297,7 +295,3 @@ func TestRSSXMLConformance(t *testing.T) {
 	assert.Equal(t, "Test Item", parsedRSS.Channel.Items[0].Title)
 	assert.Equal(t, "https://example.com/item", parsedRSS.Channel.Items[0].Link)
 }
-
-
-
-

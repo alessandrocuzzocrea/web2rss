@@ -6,19 +6,20 @@ import (
 	"github.com/alessandrocuzzocrea/web2rss/internal/db"
 )
 
-//nolint:dupl
 // mockQueries satisfies the Queries interface for testing
+//
+//nolint:dupl
 type mockQueries struct {
-	GetFeedFn                 func(ctx context.Context, id int64) (db.Feed, error)
-	ListFeedsFn               func(ctx context.Context) ([]db.Feed, error)
-	ListFeedsWithItemsCountFn func(ctx context.Context) ([]db.ListFeedsWithItemsCountRow, error)
-	CreateFeedFn              func(ctx context.Context, arg db.CreateFeedParams) (db.Feed, error)
-	UpdateFeedFn              func(ctx context.Context, arg db.UpdateFeedParams) error
+	GetFeedFn                   func(ctx context.Context, id int64) (db.Feed, error)
+	ListFeedsFn                 func(ctx context.Context) ([]db.Feed, error)
+	ListFeedsWithItemsCountFn   func(ctx context.Context) ([]db.ListFeedsWithItemsCountRow, error)
+	CreateFeedFn                func(ctx context.Context, arg db.CreateFeedParams) (db.Feed, error)
+	UpdateFeedFn                func(ctx context.Context, arg db.UpdateFeedParams) error
 	UpdateFeedLastRefreshedAtFn func(ctx context.Context, arg db.UpdateFeedLastRefreshedAtParams) error
-	DeleteFeedFn              func(ctx context.Context, id int64) error
-	ListFeedItemsFn           func(ctx context.Context, feedID int64) ([]db.FeedItem, error)
-	UpsertFeedItemFn          func(ctx context.Context, arg db.UpsertFeedItemParams) ([]int64, error)
-	DeleteItemsByFeedIDFn     func(ctx context.Context, feedID int64) error
+	DeleteFeedFn                func(ctx context.Context, id int64) error
+	ListFeedItemsFn             func(ctx context.Context, feedID int64) ([]db.FeedItem, error)
+	UpsertFeedItemFn            func(ctx context.Context, arg db.UpsertFeedItemParams) ([]int64, error)
+	DeleteItemsByFeedIDFn       func(ctx context.Context, feedID int64) error
 }
 
 func (m *mockQueries) GetFeed(ctx context.Context, id int64) (db.Feed, error) {

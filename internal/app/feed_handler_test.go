@@ -26,7 +26,7 @@ func TestHandlePreviewFeed(t *testing.T) {
 				</body>
 			</html>
 		`
-		fmt.Fprint(w, html)
+		_, _ = fmt.Fprint(w, html)
 	}))
 	defer ts.Close()
 
