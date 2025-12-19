@@ -16,25 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// mockQueries implements the same interface as db.Queries for testing
-type mockQueries struct {
-	getFeedFn       func(ctx context.Context, id int64) (db.Feed, error)
-	listFeedItemsFn func(ctx context.Context, feedID int64) ([]db.FeedItem, error)
-}
 
-func (m *mockQueries) GetFeed(ctx context.Context, id int64) (db.Feed, error) {
-	if m.getFeedFn != nil {
-		return m.getFeedFn(ctx, id)
-	}
-	return db.Feed{}, nil
-}
-
-func (m *mockQueries) ListFeedItems(ctx context.Context, feedID int64) ([]db.FeedItem, error) {
-	if m.listFeedItemsFn != nil {
-		return m.listFeedItemsFn(ctx, feedID)
-	}
-	return []db.FeedItem{}, nil
-}
 
 func TestFormatRSSDate(t *testing.T) {
 	// Test with a valid time
@@ -112,7 +94,7 @@ func TestHandleFeedRSS(t *testing.T) {
 	now := time.Now()
 
 	mockQ := &mockQueries{
-		getFeedFn: func(ctx context.Context, id int64) (db.Feed, error) {
+		GetFeedFn: func(ctx context.Context, id int64) (db.Feed, error) {
 			if id == 1 {
 				return db.Feed{
 					ID:   1,
@@ -122,7 +104,7 @@ func TestHandleFeedRSS(t *testing.T) {
 			}
 			return db.Feed{}, fmt.Errorf("feed not found")
 		},
-		listFeedItemsFn: func(ctx context.Context, feedID int64) ([]db.FeedItem, error) {
+		ListFeedItemsFn: func(ctx context.Context, feedID int64) ([]db.FeedItem, error) {
 			if feedID == 1 {
 				return []db.FeedItem{
 					{
@@ -145,7 +127,7 @@ func TestHandleFeedRSS(t *testing.T) {
 	}
 
 	app := &App{
-		queries: &db.Queries{}, // Not used in our direct call
+		queries: mockQ,
 	}
 
 	// Create a test request
@@ -153,8 +135,8 @@ func TestHandleFeedRSS(t *testing.T) {
 	req.SetPathValue("id", "1")
 	w := httptest.NewRecorder()
 
-	// Call the handler function directly with our mock
-	handleFeedRSSWithMocks(app, w, req, mockQ)
+	// Call the handler function directly
+	app.handleFeedRSS(w, req)
 
 	// Check the response
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -203,13 +185,13 @@ func TestHandleFeedRSSInvalidID(t *testing.T) {
 func TestHandleFeedRSSFeedNotFound(t *testing.T) {
 	// Create a mock app with test queries
 	mockQ := &mockQueries{
-		getFeedFn: func(ctx context.Context, id int64) (db.Feed, error) {
+		GetFeedFn: func(ctx context.Context, id int64) (db.Feed, error) {
 			return db.Feed{}, fmt.Errorf("feed not found")
 		},
 	}
 
 	app := &App{
-		queries: &db.Queries{}, // Not used in our direct call
+		queries: mockQ,
 	}
 
 	// Create a test request
@@ -217,8 +199,8 @@ func TestHandleFeedRSSFeedNotFound(t *testing.T) {
 	req.SetPathValue("id", "999")
 	w := httptest.NewRecorder()
 
-	// Call the handler function directly with our mock
-	handleFeedRSSWithMocks(app, w, req, mockQ)
+	// Call the handler function directly
+	app.handleFeedRSS(w, req)
 
 	// Check the response
 	assert.Equal(t, http.StatusNotFound, w.Code)
@@ -228,20 +210,20 @@ func TestHandleFeedRSSFeedNotFound(t *testing.T) {
 func TestHandleFeedRSSItemsError(t *testing.T) {
 	// Create a mock app with test queries that return an error when fetching items
 	mockQ := &mockQueries{
-		getFeedFn: func(ctx context.Context, id int64) (db.Feed, error) {
+		GetFeedFn: func(ctx context.Context, id int64) (db.Feed, error) {
 			return db.Feed{
 				ID:   1,
 				Name: "Test Feed",
 				Url:  "https://example.com",
 			}, nil
 		},
-		listFeedItemsFn: func(ctx context.Context, feedID int64) ([]db.FeedItem, error) {
+		ListFeedItemsFn: func(ctx context.Context, feedID int64) ([]db.FeedItem, error) {
 			return []db.FeedItem{}, fmt.Errorf("failed to fetch items")
 		},
 	}
 
 	app := &App{
-		queries: &db.Queries{}, // Not used in our direct call
+		queries: mockQ,
 	}
 
 	// Create a test request
@@ -249,8 +231,8 @@ func TestHandleFeedRSSItemsError(t *testing.T) {
 	req.SetPathValue("id", "1")
 	w := httptest.NewRecorder()
 
-	// Call the handler function directly with our mock
-	handleFeedRSSWithMocks(app, w, req, mockQ)
+	// Call the handler function directly
+	app.handleFeedRSS(w, req)
 
 	// Check the response
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
@@ -317,76 +299,7 @@ func TestRSSXMLConformance(t *testing.T) {
 	assert.Equal(t, "https://example.com/item", parsedRSS.Channel.Items[0].Link)
 }
 
-// handleFeedRSSWithMocks is a test version of handleFeedRSS that accepts mock queries
-func handleFeedRSSWithMocks(_ *App, w http.ResponseWriter, r *http.Request, queries *mockQueries) {
-	ctx := r.Context()
 
-	idStr := r.PathValue("id")
-
-	feedID, err := int64FromString(idStr)
-	if err != nil {
-		http.Error(w, "Invalid feed ID", http.StatusBadRequest)
-		return
-	}
-
-	// Get feed details
-	feed, err := queries.GetFeed(ctx, feedID)
-	if err != nil {
-		http.Error(w, "Feed not found", http.StatusNotFound)
-		return
-	}
-
-	// Get feed items
-	items, err := queries.ListFeedItems(ctx, feedID)
-	if err != nil {
-		fmt.Printf("Failed to fetch feed items: %v\n", err)
-		http.Error(w, "Failed to fetch feed items", http.StatusInternalServerError)
-		return
-	}
-
-	// Convert to RSS items
-	rssItems := make([]Item, len(items))
-	for i, item := range items {
-		rssItems[i] = Item{
-			Title:       item.Title,
-			Link:        item.Link,
-			Description: item.Description.String,
-			PubDate:     formatRSSDate(item.CreatedAt.Time),
-		}
-	}
-
-	// Create RSS feed
-	rss := RSS{
-		Version: "2.0",
-		Channel: Channel{
-			Title:       feed.Name,
-			Link:        feed.Url,
-			Description: fmt.Sprintf("RSS feed generated from %s", feed.Url),
-			Language:    "en-us",
-			PubDate:     formatRSSDate(time.Now()),
-			Items:       rssItems,
-		},
-	}
-
-	// Set headers and encode XML
-	w.Header().Set("Content-Type", "application/rss+xml; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-
-	// Write XML declaration
-	_, err = w.Write([]byte(xml.Header))
-	if err != nil {
-		http.Error(w, "Failed to write XML header", http.StatusInternalServerError)
-		return
-	}
-
-	// Encode RSS to XML
-	encoder := xml.NewEncoder(w)
-	encoder.Indent("", "  ")
-	if err := encoder.Encode(rss); err != nil {
-		http.Error(w, "Failed to generate RSS", http.StatusInternalServerError)
-		return
-	}
-}
 
 // int64FromString converts a string to int64
 func int64FromString(s string) (int64, error) {

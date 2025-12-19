@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"html/template"
@@ -17,10 +18,24 @@ const (
 	dataDirPerm = 0755
 )
 
+// Queries defines the interface for database operations
+type Queries interface {
+	GetFeed(ctx context.Context, id int64) (db.Feed, error)
+	ListFeeds(ctx context.Context) ([]db.Feed, error)
+	ListFeedsWithItemsCount(ctx context.Context) ([]db.ListFeedsWithItemsCountRow, error)
+	CreateFeed(ctx context.Context, arg db.CreateFeedParams) (db.Feed, error)
+	UpdateFeed(ctx context.Context, arg db.UpdateFeedParams) error
+	UpdateFeedLastRefreshedAt(ctx context.Context, arg db.UpdateFeedLastRefreshedAtParams) error
+	DeleteFeed(ctx context.Context, id int64) error
+	ListFeedItems(ctx context.Context, feedID int64) ([]db.FeedItem, error)
+	UpsertFeedItem(ctx context.Context, arg db.UpsertFeedItemParams) ([]int64, error)
+	DeleteItemsByFeedID(ctx context.Context, feedID int64) error
+}
+
 // App represents the main application
 type App struct {
 	db        *sql.DB
-	queries   *db.Queries
+	queries   Queries
 	templates *template.Template
 	startTime time.Time
 	config    *Config
