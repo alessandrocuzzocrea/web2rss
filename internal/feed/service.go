@@ -15,6 +15,8 @@ import (
 )
 
 // Querier defines the interface for database operations needed by the service
+//
+//nolint:dupl
 type Querier interface {
 	GetFeed(ctx context.Context, id int64) (db.Feed, error)
 	ListFeeds(ctx context.Context) ([]db.Feed, error)

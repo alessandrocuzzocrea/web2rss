@@ -14,9 +14,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize server: %v", err)
 	}
-	defer srv.Close()
+	defer func() {
+		if err := srv.Close(); err != nil {
+			log.Printf("Error closing server: %v", err)
+		}
+	}()
 
 	if err := srv.Run(); err != nil {
-		log.Fatalf("Server error: %v", err)
+		log.Printf("Server error: %v", err)
 	}
 }

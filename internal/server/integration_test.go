@@ -31,7 +31,8 @@ func TestIntegration(t *testing.T) {
 	assert.NoError(t, err)
 	_, err = database.Exec(string(schema))
 	assert.NoError(t, err)
-	database.Close() // Close it so Server can open it
+	err = database.Close() // Close it so Server can open it
+	assert.NoError(t, err)
 
 	cfg := &config.Config{
 		Port:        "8080",
@@ -43,7 +44,10 @@ func TestIntegration(t *testing.T) {
 
 	app, err := New(cfg)
 	assert.NoError(t, err)
-	defer app.Close()
+	defer func() {
+		err := app.Close()
+		assert.NoError(t, err)
+	}()
 
 	// 1. Create a mock website
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
