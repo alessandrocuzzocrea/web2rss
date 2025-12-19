@@ -8,6 +8,8 @@ GOMOD=$(GOCMD) mod
 BINARY_NAME=web2rss
 BINARY_UNIX=$(BINARY_NAME)_unix
 DOCKER_IMAGE=web2rss:latest
+GIT_HASH := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+LDFLAGS := -X github.com/alessandrocuzzocrea/web2rss/internal/app.CommitHash=$(GIT_HASH)
 
 .PHONY: all build clean test coverage deps docker docker-run help dev lint migrate-up migrate-down sqlc-generate dump-schema
 
@@ -17,7 +19,7 @@ dev: ## Start development server with hot reload
 	air -c .air.toml
 
 build: ## Build the binary file
-	$(GOBUILD) -o $(BINARY_NAME) -v ./cmd/web2rss
+	$(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BINARY_NAME) -v ./cmd/web2rss
 
 clean: ## Remove binary and test cache
 	$(GOCLEAN)
@@ -38,7 +40,7 @@ deps: ## Download dependencies
 
 # Cross compilation
 build-linux: ## Build for Linux
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_UNIX) -v ./cmd/web2rss
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 $(GOBUILD) -ldflags "$(LDFLAGS)" -o $(BINARY_UNIX) -v ./cmd/web2rss
 
 # Docker commands
 docker: ## Build docker image
@@ -55,7 +57,7 @@ docker-compose-down: ## Stop docker-compose
 
 # Development commands
 dev: ## Run in development mode
-	$(GOCMD) run ./cmd/web2rss
+	$(GOCMD) run -ldflags "$(LDFLAGS)" ./cmd/web2rss
 
 watch: ## Run with file watcher (requires entr)
 	find . -name "*.go" | entr -r $(GOCMD) run ./cmd/web2rss

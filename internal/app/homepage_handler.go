@@ -11,12 +11,13 @@ import (
 
 // HomePageData contains data for the homepage template
 type HomePageData struct {
-	Title     string
-	Version   string
-	GoVersion string
-	BuildTime string
-	Uptime    string
-	Feeds     []db.ListFeedsWithItemsCountRow
+	Title      string
+	Version    string
+	CommitHash string
+	GoVersion  string
+	BuildTime  string
+	Uptime     string
+	Feeds      []db.ListFeedsWithItemsCountRow
 }
 
 // handleHomepage renders the homepage using HTML templates
@@ -35,12 +36,13 @@ func (a *App) handleHomepage(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Feeds: %+v\n", feeds) // For debugging; remove in production
 
 	data := HomePageData{
-		Title:     "Home",
-		Version:   "0.1.0",
-		GoVersion: runtime.Version(),
-		BuildTime: "2025-09-11", // You can make this dynamic with build flags
-		Uptime:    time.Since(a.startTime).Round(time.Second).String(),
-		Feeds:     feeds,
+		Title:      "Home",
+		Version:    "0.1.0",
+		CommitHash: CommitHash,
+		GoVersion:  runtime.Version(),
+		BuildTime:  "2025-09-11", // You can make this dynamic with build flags
+		Uptime:     time.Since(a.startTime).Round(time.Second).String(),
+		Feeds:      feeds,
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
