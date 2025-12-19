@@ -304,8 +304,33 @@
       const minutes = String(date.getMinutes()).padStart(2, '0');
       const seconds = String(date.getSeconds()).padStart(2, '0');
 
-      // Get timezone name (e.g. JST, EST) if possible, or offset
-      const timeZoneName = /\((.*)\)/.exec(date.toString())?.[1] || '';
+      const getTimeZoneName = (date) => {
+        // Try to get the short name first (e.g. JST, EST, GMT+9)
+        const short = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' })
+          .formatToParts(date)
+          .find(part => part.type === 'timeZoneName')?.value || '';
+
+        // If it's not an offset style (doesn't contain GMT, UTC, or +s/-), return it
+        if (!short.match(/GMT|UTC|[+-]\d/)) {
+          return short;
+        }
+
+        // Fallback: Try to abbreviate the long name from date.toString()
+        // e.g. "Sat Dec 20 ... (Japan Standard Time)" -> "Japan Standard Time"
+        const longNameMatch = /\(([^)]+)\)/.exec(date.toString());
+        if (longNameMatch) {
+          const longName = longNameMatch[1];
+          // Create acronym: "Japan Standard Time" -> "JST"
+          const acronym = longName.match(/\b[A-Z]/g)?.join('');
+          if (acronym && acronym.length >= 2) {
+            return acronym;
+          }
+        }
+
+        return short;
+      };
+
+      const timeZoneName = getTimeZoneName(date);
 
       el.textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds} ${timeZoneName}`;
     });
@@ -313,3 +338,4 @@
 </body>
 
 </html>
+```
