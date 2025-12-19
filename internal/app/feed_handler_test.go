@@ -39,10 +39,11 @@ func TestHandlePreviewFeed(t *testing.T) {
 
 	app := &App{
 		queries: mockQ,
+		config: &Config{Timezone: "UTC"},
 	}
 
 	// Load templates
-	tmpl := template.New("")
+	tmpl := template.New("").Funcs(NewTemplateFuncs(app.config))
 	_, err := tmpl.ParseGlob("../../templates/*.html")
 	assert.NoError(t, err)
 	_, err = tmpl.ParseGlob("../../templates/partials/*.html")
@@ -77,6 +78,7 @@ func TestHandlePreviewFeedInvalidURL(t *testing.T) {
 	}
 	app := &App{
 		queries: mockQ,
+		config: &Config{Timezone: "UTC"},
 	}
 
 	form := url.Values{}
@@ -109,10 +111,11 @@ func TestHandleDuplicateFeed(t *testing.T) {
 
 	app := &App{
 		queries: mockQ,
+		config: &Config{Timezone: "UTC"},
 	}
 
 	// Load templates
-	tmpl := template.New("")
+	tmpl := template.New("").Funcs(NewTemplateFuncs(app.config))
 	_, err := tmpl.ParseGlob("../../templates/*.html")
 	assert.NoError(t, err)
 	_, err = tmpl.ParseGlob("../../templates/partials/*.html")

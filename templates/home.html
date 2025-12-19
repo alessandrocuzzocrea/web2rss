@@ -221,10 +221,8 @@
                 <strong>{{.Name}}</strong><br>
                 <small><a href="{{.Url}}" target="_blank">{{.Url}}</a></small>
               </td>
-              <td><small><span class="local-date" data-timestamp="{{.CreatedAt | isoDate}}">{{.CreatedAt |
-                    formatDate}}</span></small></td>
-              <td><small><span class="local-date" data-timestamp="{{.LastRefreshedAt | isoDate}}">{{.LastRefreshedAt |
-                    formatDate}}</span></small></td>
+              <td><small>{{.CreatedAt | formatDate}}</small></td>
+              <td><small>{{.LastRefreshedAt | formatDate}}</small></td>
               <td>{{.ItemsCount}}</td>
               <td>
                 <div style="display: flex; gap: 0.25rem; align-items: center;">
@@ -279,27 +277,17 @@
     </p>
   </footer>
 
-  <script type="module">
-    import { formatLocalizedDate } from '/js/time-utils.js';
 
-    // Handle closing the action menu when clicking outside
-    document.addEventListener('click', (event) => {
-      const menus = document.querySelectorAll('.action-menu');
-      menus.forEach((menu) => {
-        if (!menu.contains(event.target) && menu.hasAttribute('open')) {
-          menu.removeAttribute('open');
-        }
-      });
-    });
 
-    // Localize dates
-    document.querySelectorAll('.local-date').forEach(el => {
-      const iso = el.getAttribute('data-timestamp');
-      const formatted = formatLocalizedDate(iso);
-      if (formatted) {
-        el.textContent = formatted;
-      }
-    });
+  // Handle closing the action menu when clicking outside
+  document.addEventListener('click', (event) => {
+  const menus = document.querySelectorAll('.action-menu');
+  menus.forEach((menu) => {
+  if (!menu.contains(event.target) && menu.hasAttribute('open')) {
+  menu.removeAttribute('open');
+  }
+  });
+  });
   </script>
 </body>
 

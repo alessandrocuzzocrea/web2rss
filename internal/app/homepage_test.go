@@ -37,10 +37,13 @@ func TestHandleHomepage(t *testing.T) {
 
 	app := &App{
 		queries: mockQ,
+		config: &Config{
+			Timezone: "UTC",
+		},
 	}
 
 	// Load templates
-	tmpl := template.New("").Funcs(templateFuncs)
+	tmpl := template.New("").Funcs(NewTemplateFuncs(app.config))
 	_, err := tmpl.ParseGlob("../../templates/*.html")
 	assert.NoError(t, err)
 	_, err = tmpl.ParseGlob("../../templates/partials/*.html")
