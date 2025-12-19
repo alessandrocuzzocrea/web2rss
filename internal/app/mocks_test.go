@@ -6,6 +6,7 @@ import (
 	"github.com/alessandrocuzzocrea/web2rss/internal/db"
 )
 
+//nolint:dupl
 // mockQueries satisfies the Queries interface for testing
 type mockQueries struct {
 	GetFeedFn                 func(ctx context.Context, id int64) (db.Feed, error)

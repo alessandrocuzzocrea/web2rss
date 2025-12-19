@@ -18,6 +18,7 @@ const (
 	dataDirPerm = 0755
 )
 
+//nolint:dupl
 // Queries defines the interface for database operations
 type Queries interface {
 	GetFeed(ctx context.Context, id int64) (db.Feed, error)

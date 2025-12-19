@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -301,7 +300,4 @@ func TestRSSXMLConformance(t *testing.T) {
 
 
 
-// int64FromString converts a string to int64
-func int64FromString(s string) (int64, error) {
-	return strconv.ParseInt(s, 10, 64)
-}
+
