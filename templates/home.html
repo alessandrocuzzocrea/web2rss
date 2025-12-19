@@ -132,10 +132,10 @@
       z-index: 100;
       min-width: 140px;
       padding: 0.5rem 0;
-      background-color: var(--card-background-color);
+      background-color: var(--pico-card-background-color);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      border: 1px solid var(--muted-border-color);
-      border-radius: var(--border-radius);
+      border: 1px solid var(--pico-muted-border-color);
+      border-radius: var(--pico-border-radius);
       list-style: none;
       margin: 0;
     }
@@ -157,7 +157,7 @@
       text-align: left;
       font-size: 0.85rem;
       background: transparent;
-      color: var(--color);
+      color: var(--pico-color);
       text-decoration: none;
       cursor: pointer;
       line-height: 1.2;
@@ -165,7 +165,7 @@
 
     .action-menu ul li button:hover,
     .action-menu ul li a:hover {
-      background-color: var(--code-background-color);
+      background-color: var(--pico-code-background-color);
       text-decoration: none;
     }
 
@@ -276,6 +276,18 @@
       </span>
     </p>
   </footer>
+
+  <script>
+    // Handle closing the action menu when clicking outside
+    document.addEventListener('click', (event) => {
+      const menus = document.querySelectorAll('.action-menu');
+      menus.forEach((menu) => {
+        if (!menu.contains(event.target) && menu.hasAttribute('open')) {
+          menu.removeAttribute('open');
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>
