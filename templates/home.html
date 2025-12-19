@@ -277,19 +277,17 @@
     </p>
   </footer>
 
-
-
-  // Handle closing the action menu when clicking outside
-  document.addEventListener('click', (event) => {
-  const menus = document.querySelectorAll('.action-menu');
-  menus.forEach((menu) => {
-  if (!menu.contains(event.target) && menu.hasAttribute('open')) {
-  menu.removeAttribute('open');
-  }
-  });
-  });
+  <script>
+    // Handle closing the action menu when clicking outside
+    document.addEventListener('click', (event) => {
+      const menus = document.querySelectorAll('.action-menu');
+      menus.forEach((menu) => {
+        if (!menu.contains(event.target) && menu.hasAttribute('open')) {
+          menu.removeAttribute('open');
+        }
+      });
+    });
   </script>
 </body>
 
 </html>
-```
