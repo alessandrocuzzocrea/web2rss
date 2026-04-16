@@ -1,6 +1,6 @@
 module github.com/alessandrocuzzocrea/web2rss
 
-go 1.24.0
+go 1.25.0
 
 tool (
 	github.com/golang-migrate/migrate/v4/cmd/migrate
@@ -14,7 +14,7 @@ require (
 
 require (
 	github.com/PuerkitoBio/goquery v1.10.3
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
@@ -110,7 +110,7 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgtype v1.14.0 // indirect
 	github.com/jackc/pgx/v4 v4.18.3 // indirect
-	github.com/jackc/pgx/v5 v5.7.4 // indirect
+	github.com/jackc/pgx/v5 v5.9.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
